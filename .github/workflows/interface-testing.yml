@@ -1,0 +1,167 @@
+name: 🧪 Interface Testing with MCP
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  interface-tests:
+    name: 🌐 Automated Interface Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: 📦 Restore dependencies
+      run: |
+        dotnet restore
+        dotnet restore tests/TestProject.csproj
+
+    - name: 🔨 Build application
+      run: dotnet build --no-restore --configuration Release
+
+    - name: 🧪 Install Playwright
+      run: |
+        cd tests
+        dotnet build
+        playwright install chromium
+        playwright install-deps
+
+    - name: 🚀 Start application
+      run: |
+        dotnet run --configuration Release --no-build &
+        APP_PID=$!
+        echo "APP_PID=$APP_PID" >> $GITHUB_ENV
+        
+        # Wait for application to start
+        timeout 30 bash -c 'until curl -s -f http://localhost:5146 > /dev/null; do sleep 1; done'
+        echo "Application started successfully"
+
+    - name: 🧪 Run API Integration Tests
+      run: |
+        cd tests
+        dotnet test --filter "FullyQualifiedName~TodoListApiTests" \
+                    --logger "trx;LogFileName=api-tests.trx" \
+                    --results-directory ./TestResults
+
+    - name: 🌐 Run Interface Tests
+      run: |
+        cd tests
+        dotnet test --filter "FullyQualifiedName~TodoListInterfaceTests" \
+                    --logger "trx;LogFileName=interface-tests.trx" \
+                    --results-directory ./TestResults
+
+    - name: 📊 Run All Tests with Coverage
+      run: |
+        cd tests
+        dotnet test --logger "trx;LogFileName=all-tests.trx" \
+                    --results-directory ./TestResults \
+                    --collect:"XPlat Code Coverage" \
+                    --settings test.runsettings
+
+    - name: 📈 Upload Test Results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: tests/TestResults/
+
+    - name: 📄 Generate Test Report
+      if: always()
+      run: |
+        cd tests
+        # Create test summary
+        echo "## 🧪 Test Results Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Interface Testing with MCP" >> $GITHUB_STEP_SUMMARY
+        echo "Comprehensive automated testing of the Todo List interface using Model Context Protocol." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### ✅ Test Coverage" >> $GITHUB_STEP_SUMMARY
+        echo "- Interface Load and Structure Tests" >> $GITHUB_STEP_SUMMARY
+        echo "- Add Todo Functionality" >> $GITHUB_STEP_SUMMARY
+        echo "- Filter Operations" >> $GITHUB_STEP_SUMMARY
+        echo "- Task Actions (Complete, Edit, Delete)" >> $GITHUB_STEP_SUMMARY
+        echo "- Refresh Functionality" >> $GITHUB_STEP_SUMMARY
+        echo "- Responsive Design" >> $GITHUB_STEP_SUMMARY
+        echo "- Error Handling" >> $GITHUB_STEP_SUMMARY
+        echo "- Performance Testing" >> $GITHUB_STEP_SUMMARY
+        echo "- API Integration" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🎯 Quality Assurance" >> $GITHUB_STEP_SUMMARY
+        echo "These tests act as an integrated QA system, validating interface behavior, user interactions, and API integration to ensure high quality and accelerate the development cycle." >> $GITHUB_STEP_SUMMARY
+
+    - name: 🛑 Stop application
+      if: always()
+      run: |
+        if [ ! -z "$APP_PID" ]; then
+          kill $APP_PID || true
+        fi
+        pkill -f "dotnet.*TodoListApp" || true
+
+  accessibility-tests:
+    name: ♿ Accessibility Testing
+    runs-on: ubuntu-latest
+    needs: interface-tests
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: 🚀 Start application
+      run: |
+        dotnet run --configuration Release &
+        timeout 30 bash -c 'until curl -s -f http://localhost:5146 > /dev/null; do sleep 1; done'
+
+    - name: ♿ Run Accessibility Tests
+      uses: pa11y/pa11y-ci-action@v3
+      with:
+        urls: |
+          http://localhost:5146
+        threshold: 0
+        config: |
+          {
+            "chromeLaunchConfig": {
+              "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+            }
+          }
+
+  performance-tests:
+    name: ⚡ Performance Testing
+    runs-on: ubuntu-latest
+    needs: interface-tests
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: 🚀 Start application
+      run: |
+        dotnet run --configuration Release &
+        timeout 30 bash -c 'until curl -s -f http://localhost:5146 > /dev/null; do sleep 1; done'
+
+    - name: ⚡ Run Lighthouse Performance Tests
+      uses: treosh/lighthouse-ci-action@v10
+      with:
+        urls: |
+          http://localhost:5146
+        budgetPath: ./budget.json
+        uploadArtifacts: true
+        temporaryPublicStorage: true

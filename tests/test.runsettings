@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/runsettings.json",
+  "RunConfiguration": {
+    "MaxCpuCount": 1,
+    "ResultsDirectory": "./TestResults",
+    "TargetFramework": "net8.0"
+  },
+  "NUnit": {
+    "NumberOfTestWorkers": 1,
+    "StopOnError": false,
+    "DefaultTimeout": 60000,
+    "Verbosity": 2
+  },
+  "DataCollectionRunSettings": {
+    "DataCollectors": [
+      {
+        "FriendlyName": "Code Coverage",
+        "Enabled": true,
+        "Configuration": {
+          "Format": "cobertura",
+          "Exclude": "[*.Tests]*,[*.TestData]*",
+          "Include": "[TodoListApp]*"
+        }
+      }
+    ]
+  }
+}
