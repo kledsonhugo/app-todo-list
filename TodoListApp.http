@@ -1,0 +1,63 @@
+@TodoListApp_HostAddress = https://localhost:7284
+
+### Obter todas as tarefas
+GET {{TodoListApp_HostAddress}}/api/todos/
+Accept: application/json
+
+###
+
+### Obter uma tarefa específica
+GET {{TodoListApp_HostAddress}}/api/todos/1
+Accept: application/json
+
+###
+
+### Criar uma nova tarefa
+POST {{TodoListApp_HostAddress}}/api/todos/
+Content-Type: application/json
+
+{
+  "title": "Estudar .NET",
+  "description": "Aprender sobre desenvolvimento de APIs com .NET"
+}
+
+###
+
+### Criar outra tarefa
+POST {{TodoListApp_HostAddress}}/api/todos/
+Content-Type: application/json
+
+{
+  "title": "Fazer exercícios",
+  "description": "30 minutos de caminhada"
+}
+
+###
+
+### Atualizar uma tarefa
+PUT {{TodoListApp_HostAddress}}/api/todos/1
+Content-Type: application/json
+
+{
+  "title": "Estudar .NET Core",
+  "description": "Aprender sobre desenvolvimento de APIs com .NET Core e Entity Framework",
+  "isCompleted": false
+}
+
+###
+
+### Alternar status de conclusão de uma tarefa
+PATCH {{TodoListApp_HostAddress}}/api/todos/1/toggle
+Accept: application/json
+
+###
+
+### Deletar uma tarefa
+DELETE {{TodoListApp_HostAddress}}/api/todos/2
+
+###istApp_HostAddress = http://localhost:5146
+
+GET {{TodoListApp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

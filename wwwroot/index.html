@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List - Gerenciador de Tarefas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> Minha Lista de Tarefas</h1>
+            <p>Gerencie suas tarefas de forma simples e eficiente</p>
+        </header>
+
+        <main>
+            <!-- Formulário para adicionar nova tarefa -->
+            <section class="add-todo-section">
+                <h2>Adicionar Nova Tarefa</h2>
+                <form id="addTodoForm" class="todo-form">
+                    <div class="form-group">
+                        <label for="todoTitle">Título da Tarefa:</label>
+                        <input type="text" id="todoTitle" name="title" required maxlength="200" 
+                               placeholder="Digite o título da tarefa...">
+                    </div>
+                    <div class="form-group">
+                        <label for="todoDescription">Descrição (opcional):</label>
+                        <textarea id="todoDescription" name="description" maxlength="500" 
+                                  placeholder="Digite uma descrição para a tarefa..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Adicionar Tarefa
+                    </button>
+                </form>
+            </section>
+
+            <!-- Filtros -->
+            <section class="filters-section">
+                <h2>Filtrar Tarefas</h2>
+                <div class="filter-buttons">
+                    <button class="btn btn-filter active" data-filter="all">
+                        <i class="fas fa-list"></i> Todas
+                    </button>
+                    <button class="btn btn-filter" data-filter="pending">
+                        <i class="fas fa-clock"></i> Pendentes
+                    </button>
+                    <button class="btn btn-filter" data-filter="completed">
+                        <i class="fas fa-check"></i> Concluídas
+                    </button>
+                </div>
+            </section>
+
+            <!-- Lista de tarefas -->
+            <section class="todos-section">
+                <div class="todos-header">
+                    <h2>Suas Tarefas</h2>
+                    <button id="refreshBtn" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i> Atualizar
+                    </button>
+                </div>
+                
+                <div id="loading" class="loading hidden">
+                    <i class="fas fa-spinner fa-spin"></i> Carregando...
+                </div>
+                
+                <div id="todosList" class="todos-list">
+                    <!-- As tarefas serão carregadas aqui dinamicamente -->
+                </div>
+                
+                <div id="emptyMessage" class="empty-message hidden">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Nenhuma tarefa encontrada</p>
+                    <p>Adicione uma nova tarefa para começar!</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal para editar tarefa -->
+        <div id="editModal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Editar Tarefa</h3>
+                    <button class="close-btn" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="editTodoForm" class="todo-form">
+                    <input type="hidden" id="editTodoId">
+                    <div class="form-group">
+                        <label for="editTodoTitle">Título:</label>
+                        <input type="text" id="editTodoTitle" name="title" required maxlength="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="editTodoDescription">Descrição:</label>
+                        <textarea id="editTodoDescription" name="description" maxlength="500"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="editTodoCompleted">
+                            <span class="checkmark"></span>
+                            Tarefa concluída
+                        </label>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="cancelEdit">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast para notificações -->
+        <div id="toast" class="toast hidden">
+            <div class="toast-content">
+                <span id="toastMessage"></span>
+                <button id="closeToast" class="close-toast">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
