@@ -52,3 +52,29 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Terraform files (Infrastructure as Code)
+# Local .terraform directories
+terraform/**/.terraform/*
+# .tfstate files
+terraform/**/*.tfstate
+terraform/**/*.tfstate.*
+# Crash log files
+terraform/**/crash.log
+terraform/**/crash.*.log
+# Exclude all .tfvars files with sensitive data, but keep examples
+terraform/**/*.tfvars
+terraform/**/*.tfvars.json
+# Keep the example/template files
+!terraform/**/external-vars.tfvars
+!terraform/**/environments/*.tfvars
+# Ignore override files
+terraform/**/override.tf
+terraform/**/override.tf.json
+terraform/**/*_override.tf
+terraform/**/*_override.tf.json
+# Include tfplan files to ignore the plan output
+terraform/**/*tfplan*
+# Ignore CLI configuration files
+terraform/**/.terraformrc
+terraform/**/terraform.rc
