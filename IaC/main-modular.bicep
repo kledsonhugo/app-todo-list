@@ -55,22 +55,27 @@ module sqlDatabase 'modules/sqlDatabase.bicep' = {
     sqlAdminPassword: sqlAdminPassword
     managedIdentityId: identity.outputs.managedIdentityId
   }
+}
+
+// Reference to existing SQL Database for role assignment
+resource existingSqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01-preview' existing = {
+  name: '${sqlServerName}/${sqlDatabaseName}'
   dependsOn: [
-    identity
+    sqlDatabase
   ]
 }
 
-// Deploy role assignments
-module roleAssignments 'modules/roleAssignments.bicep' = {
-  name: 'role-assignments-deployment'
-  params: {
-    sqlDatabaseId: sqlDatabase.outputs.sqlDatabaseId
-    managedIdentityPrincipalId: identity.outputs.managedIdentityPrincipalId
-    managedIdentityId: identity.outputs.managedIdentityId
+// Deploy role assignments using existing resource
+resource sqlDbContributorRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: existingSqlDatabase
+  name: guid(resourceGroup().id, managedIdentityName, sqlDatabaseName, 'SQL DB Contributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '9b7fa17d-e63e-47b0-bb0a-15c516ac86ec') // SQL DB Contributor
+    principalId: identity.outputs.managedIdentityPrincipalId
+    principalType: 'ServicePrincipal'
   }
   dependsOn: [
     sqlDatabase
-    identity
   ]
 }
 
@@ -89,10 +94,7 @@ module appService 'modules/appService.bicep' = {
     managedIdentityClientId: identity.outputs.managedIdentityClientId
   }
   dependsOn: [
-    monitoring
-    sqlDatabase
-    identity
-    roleAssignments
+    sqlDbContributorRoleAssignment
   ]
 }
 

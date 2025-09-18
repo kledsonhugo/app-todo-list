@@ -18,6 +18,9 @@ param sqlAdminPassword string
 @description('Custom domain name for the application')
 param customDomain string = ''
 
+// TODO: Implement custom domain configuration if provided
+// This parameter is reserved for future use
+
 // Variables
 var resourceNamePrefix = '${appNamePrefix}-${environmentName}'
 var appServicePlanName = '${resourceNamePrefix}-asp'
