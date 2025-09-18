@@ -218,6 +218,24 @@ section h2 {
     margin-bottom: 10px;
 }
 
+.todo-title-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.todo-context-icon {
+    font-size: 1.4rem;
+    color: #667eea;
+    min-width: 24px;
+    text-align: center;
+}
+
+.todo-item.completed .todo-context-icon {
+    color: #a0aec0;
+}
+
 .todo-title {
     font-size: 1.2rem;
     font-weight: 600;
