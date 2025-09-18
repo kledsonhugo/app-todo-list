@@ -116,6 +116,95 @@ namespace TodoListApp.Controllers
             return Ok(MapToDto(updatedTodo));
         }
         
+        /// <summary>
+        /// ⚠️ MÉTODO VULNERÁVEL - APENAS PARA FINS EDUCACIONAIS ⚠️
+        /// Este método demonstra uma vulnerabilidade de SQL Injection
+        /// NUNCA USE ESTA ABORDAGEM EM PRODUÇÃO!
+        /// </summary>
+        /// <param name="searchTerm">Termo de busca (VULNERÁVEL)</param>
+        /// <returns>Resultado da busca vulnerável</returns>
+        [HttpGet("vulnerable-search")]
+        public async Task<ActionResult<IEnumerable<TodoItemDto>>> VulnerableSearch(string searchTerm)
+        {
+            // ⚠️ CÓDIGO VULNERÁVEL - SQL INJECTION ⚠️
+            // Este é um exemplo de como NÃO fazer uma consulta
+            
+            // Simulação de uma query SQL vulnerável que seria executada
+            var vulnerableSqlQuery = $"SELECT * FROM Todos WHERE Title LIKE '%{searchTerm}%' OR Description LIKE '%{searchTerm}%'";
+            
+            // Log da query vulnerável para demonstrar o problema
+            Console.WriteLine($"⚠️ Query Vulnerável Executada: {vulnerableSqlQuery}");
+            Console.WriteLine($"⚠️ Se searchTerm fosse: \"'; DROP TABLE Todos; --\"");
+            Console.WriteLine($"⚠️ A query seria: SELECT * FROM Todos WHERE Title LIKE '%'; DROP TABLE Todos; --%'");
+            
+            // Para fins de demonstração, vamos simular alguns ataques comuns
+            if (searchTerm.Contains("'") || searchTerm.Contains(";") || 
+                searchTerm.ToLower().Contains("drop") || searchTerm.ToLower().Contains("delete") ||
+                searchTerm.ToLower().Contains("insert") || searchTerm.ToLower().Contains("update"))
+            {
+                Console.WriteLine("🚨 ATAQUE DE SQL INJECTION DETECTADO! 🚨");
+                Console.WriteLine($"🚨 Entrada maliciosa: {searchTerm}");
+                
+                // Em um cenário real, isso poderia resultar em:
+                // - Vazamento de dados
+                // - Exclusão de tabelas
+                // - Modificação não autorizada
+                // - Acesso a informações sensíveis
+                
+                return BadRequest(new { 
+                    error = "SQL Injection detectado!", 
+                    message = "Em um sistema real, este ataque poderia comprometer toda a base de dados.",
+                    vulnerableQuery = vulnerableSqlQuery,
+                    educationalNote = "Este é um exemplo educacional. NUNCA construa queries assim em produção!"
+                });
+            }
+            
+            // Simulação da busca "segura" apenas para demonstração
+            var todos = await _todoService.GetAllTodosAsync();
+            var filteredTodos = todos.Where(t => 
+                t.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (t.Description?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+            );
+            
+            var todoDtos = filteredTodos.Select(MapToDto);
+            
+            return Ok(new {
+                results = todoDtos,
+                educationalInfo = new {
+                    vulnerableQuery = vulnerableSqlQuery,
+                    warning = "Esta query seria vulnerável a SQL Injection em um cenário real!",
+                    correctApproach = "Use parâmetros ou ORMs como Entity Framework"
+                }
+            });
+        }
+
+        /// <summary>
+        /// ✅ MÉTODO SEGURO - Como fazer a busca corretamente
+        /// </summary>
+        /// <param name="searchTerm">Termo de busca</param>
+        /// <returns>Resultado da busca segura</returns>
+        [HttpGet("secure-search")]
+        public async Task<ActionResult<IEnumerable<TodoItemDto>>> SecureSearch(string searchTerm)
+        {
+            // ✅ Abordagem segura usando parâmetros
+            Console.WriteLine("✅ Busca segura executada com parâmetros");
+            
+            // Em um cenário real com Entity Framework, seria algo como:
+            // var todos = await _context.Todos
+            //     .Where(t => EF.Functions.Like(t.Title, $"%{searchTerm}%") || 
+            //                 EF.Functions.Like(t.Description, $"%{searchTerm}%"))
+            //     .ToListAsync();
+            
+            var todos = await _todoService.GetAllTodosAsync();
+            var filteredTodos = todos.Where(t => 
+                t.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                (t.Description?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false)
+            );
+            
+            var todoDtos = filteredTodos.Select(MapToDto);
+            return Ok(todoDtos);
+        }
+        
         private static TodoItemDto MapToDto(TodoItem todoItem)
         {
             return new TodoItemDto
