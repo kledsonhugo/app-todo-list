@@ -68,6 +68,13 @@ function setupEventListeners() {
         }
     });
     
+    // Fechar modal ao pressionar Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !elements.editModal.classList.contains('hidden')) {
+            closeEditModal();
+        }
+    });
+    
     // Fechar toast automaticamente
     setTimeout(hideToast, 5000);
 }

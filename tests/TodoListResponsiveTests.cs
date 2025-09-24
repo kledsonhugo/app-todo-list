@@ -65,7 +65,7 @@ public class TodoListResponsiveTests : PageTest
         await Expect(Page.Locator("#todoDescription")).ToBeVisibleAsync();
         
         // Verify buttons are appropriately sized
-        var addButton = Page.Locator("button[type='submit']");
+        var addButton = Page.GetByRole(AriaRole.Button, new() { Name = "Adicionar Tarefa" });
         await Expect(addButton).ToBeVisibleAsync();
     }
 
@@ -104,7 +104,7 @@ public class TodoListResponsiveTests : PageTest
             await Page.FillAsync("#todoDescription", "Responsive test description");
             
             // Verify submit button is clickable
-            var submitButton = Page.Locator("button[type='submit']");
+            var submitButton = Page.GetByRole(AriaRole.Button, new() { Name = "Adicionar Tarefa" });
             await Expect(submitButton).ToBeVisibleAsync();
             await Expect(submitButton).ToBeEnabledAsync();
             

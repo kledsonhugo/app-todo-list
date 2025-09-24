@@ -39,7 +39,7 @@ public class TodoListWebTests : PageTest
         await Page.FillAsync("#todoDescription", "Test Description");
         
         // Submit the form
-        await Page.ClickAsync("button[type='submit']");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Adicionar Tarefa" }).ClickAsync();
         
         // Wait for the task to appear and verify it exists
         await Page.WaitForSelectorAsync(".todo-item:has-text('Test Task')", new PageWaitForSelectorOptions { Timeout = 5000 });
@@ -56,7 +56,7 @@ public class TodoListWebTests : PageTest
         await Page.FillAsync("#todoDescription", "Test Description");
         
         // Try to submit - should not work due to HTML5 validation
-        await Page.ClickAsync("button[type='submit']");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Adicionar Tarefa" }).ClickAsync();
         
         // Verify validation message appears
         var titleInput = Page.Locator("#todoTitle");
@@ -108,9 +108,9 @@ public class TodoListWebTests : PageTest
     [TestMethod]
     public async Task CanOpenEditModal()
     {
-        // Find the first todo item and click edit
+        // Find the first todo item and click edit using a more specific selector
         var firstTodo = Page.Locator(".todo-item").First;
-        await firstTodo.Locator(".edit-btn").ClickAsync();
+        await firstTodo.GetByRole(AriaRole.Button, new() { Name = "Editar" }).ClickAsync();
         
         // Verify modal is visible
         await Expect(Page.Locator("#editModal")).ToBeVisibleAsync();
@@ -126,7 +126,7 @@ public class TodoListWebTests : PageTest
     {
         // Open edit modal
         var firstTodo = Page.Locator(".todo-item").First;
-        await firstTodo.Locator(".edit-btn").ClickAsync();
+        await firstTodo.GetByRole(AriaRole.Button, new() { Name = "Editar" }).ClickAsync();
         
         // Click cancel
         await Page.ClickAsync("#cancelEdit");
@@ -140,7 +140,7 @@ public class TodoListWebTests : PageTest
     {
         // Open edit modal
         var firstTodo = Page.Locator(".todo-item").First;
-        await firstTodo.Locator(".edit-btn").ClickAsync();
+        await firstTodo.GetByRole(AriaRole.Button, new() { Name = "Editar" }).ClickAsync();
         
         // Click close button (X)
         await Page.ClickAsync("#closeModal");

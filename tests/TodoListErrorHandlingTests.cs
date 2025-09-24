@@ -247,7 +247,7 @@ public class TodoListErrorHandlingTests : PageTest
         var firstTodo = Page.Locator(".todo-item").First;
         if (await firstTodo.IsVisibleAsync())
         {
-            await firstTodo.Locator(".edit-btn").ClickAsync();
+            await firstTodo.GetByRole(AriaRole.Button, new() { Name = "Editar" }).ClickAsync();
             
             // Verify modal is open
             await Expect(Page.Locator("#editModal")).ToBeVisibleAsync();
