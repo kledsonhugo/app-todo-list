@@ -1,0 +1,189 @@
+name: 'Testes Interface Web com Playwright'
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  playwright-tests:
+    name: 'Testes de Interface Web'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: 'Checkout do código'
+      uses: actions/checkout@v4
+
+    - name: 'Setup .NET'
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 'Cache dependências .NET'
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: 'Restore dependências'
+      run: dotnet restore app-todo-list.sln
+
+    - name: 'Build aplicação'
+      run: dotnet build app-todo-list.sln --no-restore --configuration Release
+
+    - name: 'Build projeto de testes'
+      run: dotnet build tests/TodoListApp.Tests.csproj --no-restore --configuration Release
+
+    - name: 'Install Playwright CLI'
+      run: dotnet tool install --global Microsoft.Playwright.CLI
+
+    - name: 'Install Playwright browsers'
+      run: playwright install --with-deps
+
+    - name: 'Cache Playwright browsers'
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: ${{ runner.os }}-playwright-${{ hashFiles('tests/TodoListApp.Tests.csproj') }}
+
+    - name: 'Iniciar aplicação em background'
+      run: |
+        cd ${{ github.workspace }}
+        dotnet run --project TodoListApp.csproj --configuration Release --no-build &
+        echo "APP_PID=$!" >> $GITHUB_ENV
+      env:
+        ASPNETCORE_URLS: 'http://localhost:5146'
+        ASPNETCORE_ENVIRONMENT: 'Production'
+
+    - name: 'Aguardar aplicação inicializar'
+      run: |
+        timeout 60 bash -c 'until curl -s http://localhost:5146/api/todos; do sleep 2; done'
+        echo "✅ Aplicação iniciada com sucesso"
+
+    - name: 'Validar API está funcionando'
+      run: |
+        response=$(curl -s http://localhost:5146/api/todos)
+        if [[ $response == *"Estudar .NET"* ]]; then
+          echo "✅ API respondendo com dados corretos"
+        else
+          echo "❌ API não está respondendo corretamente"
+          exit 1
+        fi
+
+    - name: 'Executar testes de funcionalidade principal'
+      run: |
+        cd tests/
+        dotnet test --filter "TestClass=TodoListWebTests" \
+          --configuration Release \
+          --no-build \
+          --logger "trx;LogFileName=core-tests.trx" \
+          --logger "console;verbosity=detailed"
+
+    - name: 'Executar testes de design responsivo'
+      run: |
+        cd tests/
+        dotnet test --filter "TestClass=TodoListResponsiveTests" \
+          --configuration Release \
+          --no-build \
+          --logger "trx;LogFileName=responsive-tests.trx" \
+          --logger "console;verbosity=detailed"
+
+    - name: 'Executar testes de tratamento de erros'
+      run: |
+        cd tests/
+        dotnet test --filter "TestClass=TodoListErrorHandlingTests" \
+          --configuration Release \
+          --no-build \
+          --logger "trx;LogFileName=error-tests.trx" \
+          --logger "console;verbosity=detailed"
+
+    - name: 'Executar todos os testes'
+      run: |
+        cd tests/
+        dotnet test --configuration Release \
+          --no-build \
+          --logger "trx;LogFileName=all-tests.trx" \
+          --logger "console;verbosity=detailed"
+
+    - name: 'Upload resultados dos testes'
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: tests/TestResults/*.trx
+
+    - name: 'Upload screenshots (em caso de falha)'
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-screenshots
+        path: tests/bin/Debug/net8.0/playwright-screenshots/
+
+    - name: 'Upload logs do Playwright'
+      uses: actions/upload-artifact@v4  
+      if: always()
+      with:
+        name: playwright-logs
+        path: tests/bin/Debug/net8.0/playwright-logs/
+
+    - name: 'Cleanup processo da aplicação'
+      if: always()
+      run: |
+        if [ ! -z "$APP_PID" ]; then
+          kill $APP_PID || true
+        fi
+        pkill -f "dotnet.*TodoListApp" || true
+
+  test-summary:
+    name: 'Resumo dos Testes'
+    runs-on: ubuntu-latest
+    needs: playwright-tests
+    if: always()
+    
+    steps:
+    - name: 'Download resultados dos testes'
+      uses: actions/download-artifact@v4
+      with:
+        name: test-results
+        path: test-results/
+
+    - name: 'Publicar resultados dos testes'
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: 'Resultados dos Testes de Interface'
+        path: 'test-results/*.trx'
+        reporter: 'dotnet-trx'
+        fail-on-error: true
+
+    - name: 'Gerar resumo'
+      if: always()
+      run: |
+        echo "## 🎭 Resultados dos Testes de Interface Web" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Estatísticas" >> $GITHUB_STEP_SUMMARY
+        echo "- **Framework**: Playwright + MSTest + .NET 8.0" >> $GITHUB_STEP_SUMMARY
+        echo "- **Browsers**: Chromium, Firefox, WebKit" >> $GITHUB_STEP_SUMMARY  
+        echo "- **Viewports**: 320px, 375px, 768px, 1200px" >> $GITHUB_STEP_SUMMARY
+        echo "- **Total de Testes**: 29 métodos" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🧪 Categorias de Teste" >> $GITHUB_STEP_SUMMARY
+        echo "- **Funcionalidade Principal**: 12 testes" >> $GITHUB_STEP_SUMMARY
+        echo "- **Design Responsivo**: 6 testes" >> $GITHUB_STEP_SUMMARY
+        echo "- **Tratamento de Erros**: 11 testes" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ needs.playwright-tests.result }}" == "success" ]; then
+          echo "### ✅ Status: SUCESSO" >> $GITHUB_STEP_SUMMARY
+          echo "Todos os testes de interface passaram com sucesso!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ❌ Status: FALHA" >> $GITHUB_STEP_SUMMARY
+          echo "Alguns testes falharam. Verifique os logs para detalhes." >> $GITHUB_STEP_SUMMARY
+        fi
