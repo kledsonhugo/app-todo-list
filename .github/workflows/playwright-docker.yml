@@ -2,14 +2,14 @@ name: 'Testes Playwright - Docker'
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, test ]
     paths: 
       - 'tests/**'
       - 'wwwroot/**'
       - '*.cs'
       - '*.csproj'
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, test ]
     paths:
       - 'tests/**'
       - 'wwwroot/**'

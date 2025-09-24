@@ -16,8 +16,8 @@ Pipeline principal para execução completa dos testes Playwright:
 - ✅ Cache de dependências e browsers
 
 **Triggers:**
-- Push para `main` ou `develop`
-- Pull requests para `main` ou `develop`
+- Push para `main`, `develop` ou `test`
+- Pull requests para `main`, `develop` ou `test`
 - Execução manual via `workflow_dispatch`
 
 ### `playwright-docker.yml` - **Execução Docker**
@@ -30,7 +30,7 @@ Pipeline otimizado usando imagem Docker com browsers pré-instalados:
 - ✅ Relatório de implementação
 
 **Triggers:**
-- Push/PR que afeta arquivos de teste
+- Push/PR para `main`, `develop` ou `test` que afeta arquivos de teste
 - Mudanças em `wwwroot/`, `tests/`, `*.cs`, `*.csproj`
 
 ### `ci.yml` - **Build e Validação**

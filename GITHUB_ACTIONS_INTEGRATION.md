@@ -37,8 +37,8 @@ Este documento detalha a implementação completa do pipeline de CI/CD com GitHu
 ## 🔧 **Triggers Configurados:**
 
 ### Automáticos:
-- **Push** para branches `main` ou `develop`
-- **Pull Requests** para branches `main` ou `develop`
+- **Push** para branches `main`, `develop` ou `test`
+- **Pull Requests** para branches `main`, `develop` ou `test`
 - **Mudanças** em arquivos de teste (`tests/**`, `wwwroot/**`, `*.cs`, `*.csproj`)
 
 ### Manual:

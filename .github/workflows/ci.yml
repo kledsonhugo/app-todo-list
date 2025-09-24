@@ -2,9 +2,9 @@ name: 'CI/CD Todo List'
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, test ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, test ]
 
 env:
   DOTNET_VERSION: '8.0.x'
