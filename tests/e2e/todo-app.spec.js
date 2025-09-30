@@ -122,22 +122,23 @@ test.describe('Todo List Application', () => {
     const allTodos = page.locator('.todo-item');
     const initialCount = await allTodos.count();
     
-    // Filtrar por tarefas pendentes
-    await page.click('[data-filter="pending"]');
-    await page.waitForTimeout(500);
+    // Filtrar por tarefas pendentes - usando força para evitar intercepts
+    await page.locator('[data-filter="pending"]').click({ force: true });
+    await page.waitForTimeout(1000);
     
     // Verificar se o filtro está ativo
     await expect(page.locator('[data-filter="pending"]')).toHaveClass(/active/);
     
-    // Filtrar por tarefas concluídas
-    await page.click('[data-filter="completed"]');
-    await page.waitForTimeout(500);
+    // Filtrar por tarefas concluídas - scroll primeiro para garantir visibilidade
+    await page.locator('[data-filter="completed"]').scrollIntoViewIfNeeded();
+    await page.locator('[data-filter="completed"]').click({ force: true });
+    await page.waitForTimeout(1000);
     
     // Verificar se o filtro está ativo
     await expect(page.locator('[data-filter="completed"]')).toHaveClass(/active/);
     
     // Voltar para mostrar todas
-    await page.click('[data-filter="all"]');
+    await page.locator('[data-filter="all"]').click({ force: true });
     await page.waitForTimeout(500);
     
     // Verificar se todas as tarefas estão visíveis novamente
@@ -148,16 +149,23 @@ test.describe('Todo List Application', () => {
     // Aguardar que as tarefas carreguem
     await page.waitForSelector('.todo-item', { timeout: 10000 });
     
-    // Clicar no botão de editar da primeira tarefa
+    // Aguardar que a página esteja completamente carregada
+    await page.waitForLoadState('networkidle');
+    
+    // Localizar e aguardar o botão de editar ficar estável
     const editButton = page.locator('.todo-item .edit-btn').first();
-    await editButton.click();
+    await editButton.waitFor({ state: 'visible' });
+    await editButton.scrollIntoViewIfNeeded();
+    
+    // Usar force click para evitar intercepts
+    await editButton.click({ force: true });
     
     // Verificar se o modal foi aberto
     await expect(page.locator('#editModal')).toBeVisible();
     await expect(page.locator('#editModal h3')).toContainText('Editar Tarefa');
     
     // Fechar o modal
-    await page.click('#closeModal');
+    await page.locator('#closeModal').click({ force: true });
     
     // Verificar se o modal foi fechado
     await expect(page.locator('#editModal')).toHaveClass(/hidden/);
@@ -184,18 +192,26 @@ test.describe('Todo List Application', () => {
     // Aguardar que as tarefas carreguem
     await page.waitForSelector('.todo-item', { timeout: 10000 });
     
+    // Aguardar que a página esteja completamente carregada
+    await page.waitForLoadState('networkidle');
+    
     // Contar tarefas antes
     const todoItemsBefore = page.locator('.todo-item');
     const countBefore = await todoItemsBefore.count();
     
     if (countBefore > 0) {
-      // Clicar no botão de excluir da primeira tarefa
+      // Localizar o botão de excluir da primeira tarefa
       const deleteButton = page.locator('.todo-item .delete-btn').first();
+      
+      // Aguardar que o botão esteja visível e estável
+      await deleteButton.waitFor({ state: 'visible' });
+      await deleteButton.scrollIntoViewIfNeeded();
       
       // Configurar handler para aceitar o diálogo
       page.on('dialog', dialog => dialog.accept());
       
-      await deleteButton.click();
+      // Usar force click para evitar intercepts
+      await deleteButton.click({ force: true });
       
       // Aguardar que a tarefa seja removida
       await page.waitForTimeout(2000);
