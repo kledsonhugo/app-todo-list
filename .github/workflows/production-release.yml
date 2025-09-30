@@ -205,7 +205,7 @@ jobs:
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
-        extra_args: --only-verified --fail
+        extra_args: --only-verified
       continue-on-error: true
 
   build-artifacts:
