@@ -270,10 +270,16 @@ function createTodoHTML(todo) {
     const createdDate = new Date(todo.createdAt).toLocaleDateString('pt-BR');
     const completedDate = todo.completedAt ? new Date(todo.completedAt).toLocaleDateString('pt-BR') : null;
     
+    // Use the todo's icon or fallback to default
+    const iconClass = todo.icon || 'fas fa-tasks';
+    
     return `
         <div class="todo-item ${todo.isCompleted ? 'completed' : ''}" data-id="${todo.id}">
             <div class="todo-header">
-                <h3 class="todo-title">${escapeHtml(todo.title)}</h3>
+                <div class="todo-title-section">
+                    <i class="${iconClass} todo-context-icon"></i>
+                    <h3 class="todo-title">${escapeHtml(todo.title)}</h3>
+                </div>
                 <div class="todo-actions">
                     <button class="btn btn-small btn-success toggle-btn" data-id="${todo.id}">
                         <i class="fas ${todo.isCompleted ? 'fa-undo' : 'fa-check'}"></i>

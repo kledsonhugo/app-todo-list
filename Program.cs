@@ -7,8 +7,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { 
-        Title = "Todo List API", 
+    c.SwaggerDoc("v1", new()
+    {
+        Title = "Todo List API",
         Version = "v1",
         Description = "Uma API simples para gerenciar lista de tarefas"
     });
@@ -16,6 +17,7 @@ builder.Services.AddSwaggerGen(c =>
 
 // Registrar o serviço de Todo
 builder.Services.AddSingleton<ITodoService, TodoService>();
+builder.Services.AddSingleton<IIconService, IconService>();
 
 // Configurar CORS
 builder.Services.AddCors(options =>
