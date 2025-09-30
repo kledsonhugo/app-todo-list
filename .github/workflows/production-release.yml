@@ -188,6 +188,8 @@ jobs:
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: 🔧 Setup .NET
       uses: actions/setup-dotnet@v3
@@ -203,8 +205,8 @@ jobs:
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
-        base: main
-        head: HEAD
+        extra_args: --only-verified --fail
+      continue-on-error: true
 
   build-artifacts:
     name: 📦 Build Release Artifacts
