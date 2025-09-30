@@ -1,4 +1,4 @@
-name: 🌐 Todo List - Multi-Browser E2E Tests
+name: Testes Playwright - Multi-Browser E2E Tests
 
 on:
   schedule:
@@ -96,7 +96,7 @@ jobs:
       working-directory: tests
       run: |
         # Use optimized config with maximum parallelization for CI
-        npx playwright test --project=${{ matrix.browser }} --config=playwright-simple.config.js --reporter=html --workers=4
+        npx playwright test --project=${{ matrix.browser }} --config=playwright-simple.config.js --reporter=html
       env:
         CI: true
         PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.browser }}

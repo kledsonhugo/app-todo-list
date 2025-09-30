@@ -1,4 +1,4 @@
-name: 🚀 Todo List - Production Release Pipeline
+name: Testes Playwright - Production Release
 
 on:
   push:
@@ -167,6 +167,7 @@ jobs:
       run: npx playwright test --config=playwright-chromium.config.js --reporter=html
       env:
         CI: true
+        PLAYWRIGHT_WORKERS: 4
 
     - name: 🛑 Stop application
       if: always()

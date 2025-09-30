@@ -1,4 +1,4 @@
-name: 🎭 Todo List - E2E Tests with Playwright
+name: Testes Playwright - E2E Tests
 
 on:
   push:
@@ -61,7 +61,7 @@ jobs:
 
     - name: 🧪 Run Playwright tests
       working-directory: tests
-      run: npx playwright test --config=playwright-chromium.config.js --reporter=html --workers=4
+      run: npx playwright test --config=playwright-chromium.config.js --reporter=html
       env:
         CI: true
         PLAYWRIGHT_WORKERS: 4

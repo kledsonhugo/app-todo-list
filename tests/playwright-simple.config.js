@@ -5,7 +5,7 @@ export default defineConfig({
   fullyParallel: true, // Permitir paralelização total
   retries: process.env.CI ? 2 : 1, // Mais retries em CI
   workers: process.env.CI 
-    ? (process.env.PLAYWRIGHT_WORKERS || 4) // 4 workers em CI ou valor personalizado
+    ? parseInt(process.env.PLAYWRIGHT_WORKERS) || 4 // Converter para número
     : '25%', // 25% localmente
   reporter: process.env.CI ? [['html'], ['github']] : 'list',
   timeout: 90000, // Timeout maior para acomodar todos os browsers
