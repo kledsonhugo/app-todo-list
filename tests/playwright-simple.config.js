@@ -21,6 +21,19 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 }
       },
     },
+    {
+      name: 'firefox',
+      use: { 
+        channel: 'firefox',
+        viewport: { width: 1280, height: 720 }
+      },
+    },
+    {
+      name: 'webkit',
+      use: { 
+        viewport: { width: 1280, height: 720 }
+      },
+    },
   ],
   webServer: {
     command: 'echo "App should already be running"',
