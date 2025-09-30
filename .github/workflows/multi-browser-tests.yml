@@ -1,0 +1,141 @@
+name: 🌐 Todo List - Multi-Browser E2E Tests
+
+on:
+  schedule:
+    # Executa todos os dias às 2:00 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      browsers:
+        description: 'Browsers to test'
+        required: true
+        default: 'chromium,firefox,webkit'
+        type: choice
+        options:
+        - 'chromium'
+        - 'firefox'
+        - 'webkit'
+        - 'chromium,firefox'
+        - 'chromium,firefox,webkit'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '18'
+
+jobs:
+  test-strategy:
+    name: 🎯 Define Test Strategy
+    runs-on: ubuntu-latest
+    outputs:
+      browsers: ${{ steps.browsers.outputs.list }}
+    steps:
+    - name: 🎯 Set browser list
+      id: browsers
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          BROWSERS="${{ github.event.inputs.browsers }}"
+        else
+          BROWSERS="chromium,firefox,webkit"
+        fi
+        echo "list=[\"$(echo $BROWSERS | sed 's/,/\",\"/g')\"]" >> $GITHUB_OUTPUT
+
+  multi-browser-tests:
+    name: 🧪 Test on ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    needs: test-strategy
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: ${{ fromJson(needs.test-strategy.outputs.browsers) }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: tests/package-lock.json
+
+    - name: 📦 Restore .NET dependencies
+      run: dotnet restore app-todo-list.sln
+
+    - name: 🏗️ Build .NET application
+      run: dotnet build app-todo-list.sln --no-restore
+
+    - name: 📦 Install Node.js dependencies
+      working-directory: tests
+      run: npm ci
+
+    - name: 🎭 Install Playwright browsers
+      working-directory: tests
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+
+    - name: 🚀 Start application in background
+      run: |
+        dotnet run --project TodoListApp.csproj &
+        echo "APP_PID=$!" >> $GITHUB_ENV
+      env:
+        ASPNETCORE_ENVIRONMENT: Production
+        ASPNETCORE_URLS: http://localhost:5146
+
+    - name: ⏳ Wait for application to be ready
+      run: |
+        timeout 90 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 3; done'
+        echo "✅ Application is ready for ${{ matrix.browser }}!"
+
+    - name: 🧪 Run Playwright tests on ${{ matrix.browser }}
+      working-directory: tests
+      run: npx playwright test --project=${{ matrix.browser }} --reporter=html
+      env:
+        PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.browser }}
+
+    - name: 🛑 Stop application
+      if: always()
+      run: |
+        if [ ! -z "$APP_PID" ]; then
+          kill $APP_PID || true
+        fi
+
+    - name: 📊 Upload test results for ${{ matrix.browser }}
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report-${{ matrix.browser }}
+        path: tests/playwright-report-${{ matrix.browser }}/
+        retention-days: 30
+
+    - name: 📸 Upload screenshots for ${{ matrix.browser }}
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: playwright-screenshots-${{ matrix.browser }}
+        path: tests/test-results/
+        retention-days: 30
+
+  test-summary:
+    name: 📋 Test Summary
+    runs-on: ubuntu-latest
+    needs: multi-browser-tests
+    if: always()
+    steps:
+    - name: 📋 Generate Summary
+      run: |
+        echo "## 🌐 Multi-Browser Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Browser Test Status:" >> $GITHUB_STEP_SUMMARY
+        echo "- Check individual artifacts for detailed results" >> $GITHUB_STEP_SUMMARY
+        echo "- Screenshots available for failed tests" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Download artifacts to review detailed reports" >> $GITHUB_STEP_SUMMARY
+        echo "2. Check screenshots if any tests failed" >> $GITHUB_STEP_SUMMARY
+        echo "3. Review console logs for debugging" >> $GITHUB_STEP_SUMMARY

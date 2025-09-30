@@ -1,0 +1,163 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - heading " Minha Lista de Tarefas" [level=1] [ref=e4]:
+      - generic [ref=e5]: 
+      - text: Minha Lista de Tarefas
+    - paragraph [ref=e6]: Gerencie suas tarefas de forma simples e eficiente
+  - main [ref=e7]:
+    - generic [ref=e8]:
+      - heading "Adicionar Nova Tarefa" [level=2] [ref=e9]
+      - generic [ref=e10]:
+        - generic [ref=e11]:
+          - generic [ref=e12]: "Título da Tarefa:"
+          - textbox "Título da Tarefa:" [ref=e13]
+        - generic [ref=e14]:
+          - generic [ref=e15]: "Descrição (opcional):"
+          - textbox "Descrição (opcional):" [ref=e16]
+        - button "+ Adicionar Tarefa" [ref=e17] [cursor=pointer]:
+          - generic [ref=e18] [cursor=pointer]: +
+          - text: Adicionar Tarefa
+    - generic [ref=e19]:
+      - heading "Filtrar Tarefas" [level=2] [ref=e20]
+      - generic [ref=e21]:
+        - button " Todas" [ref=e22] [cursor=pointer]:
+          - generic [ref=e23] [cursor=pointer]: 
+          - text: Todas
+        - button " Pendentes" [ref=e24] [cursor=pointer]:
+          - generic [ref=e25] [cursor=pointer]: 
+          - text: Pendentes
+        - button " Concluídas" [ref=e26] [cursor=pointer]:
+          - generic [ref=e27] [cursor=pointer]: 
+          - text: Concluídas
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - heading "Suas Tarefas" [level=2] [ref=e30]
+        - button " Atualizar" [ref=e31] [cursor=pointer]:
+          - generic [ref=e32] [cursor=pointer]: 
+          - text: Atualizar
+      - text: 
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - heading "Nova Tarefa de Teste" [level=3] [ref=e36]
+            - generic [ref=e37]:
+              - button " Concluir" [ref=e38] [cursor=pointer]:
+                - generic [ref=e39] [cursor=pointer]: 
+                - text: Concluir
+              - button " Editar" [ref=e40] [cursor=pointer]:
+                - generic [ref=e41] [cursor=pointer]: 
+                - text: Editar
+              - button " Excluir" [ref=e42] [cursor=pointer]:
+                - generic [ref=e43] [cursor=pointer]: 
+                - text: Excluir
+          - paragraph [ref=e44]: Descrição da nova tarefa criada pelo teste
+          - generic [ref=e45]:
+            - generic [ref=e47]: "Criada em: 30/09/2025"
+            - generic [ref=e48]:
+              - generic [ref=e49]: 
+              - text: Pendente
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - heading "Teste API - Novo TODO" [level=3] [ref=e52]
+            - generic [ref=e53]:
+              - button " Concluir" [ref=e54] [cursor=pointer]:
+                - generic [ref=e55] [cursor=pointer]: 
+                - text: Concluir
+              - button " Editar" [ref=e56] [cursor=pointer]:
+                - generic [ref=e57] [cursor=pointer]: 
+                - text: Editar
+              - button " Excluir" [ref=e58] [cursor=pointer]:
+                - generic [ref=e59] [cursor=pointer]: 
+                - text: Excluir
+          - paragraph [ref=e60]: Descrição do TODO criado via teste de API
+          - generic [ref=e61]:
+            - generic [ref=e63]: "Criada em: 30/09/2025"
+            - generic [ref=e64]:
+              - generic [ref=e65]: 
+              - text: Pendente
+        - generic [ref=e66]:
+          - generic [ref=e67]:
+            - heading "TODO Atualizado" [level=3] [ref=e68]
+            - generic [ref=e69]:
+              - button " Reabrir" [ref=e70] [cursor=pointer]:
+                - generic [ref=e71] [cursor=pointer]: 
+                - text: Reabrir
+              - button " Editar" [ref=e72] [cursor=pointer]:
+                - generic [ref=e73] [cursor=pointer]: 
+                - text: Editar
+              - button " Excluir" [ref=e74] [cursor=pointer]:
+                - generic [ref=e75] [cursor=pointer]: 
+                - text: Excluir
+          - paragraph [ref=e76]: Descrição atualizada
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - generic [ref=e79]: "Criada em: 30/09/2025"
+              - generic [ref=e80]: "Concluída em: 30/09/2025"
+            - generic [ref=e81]:
+              - generic [ref=e82]: 
+              - text: Concluída
+        - generic [ref=e83]:
+          - generic [ref=e84]:
+            - heading "Teste API - Novo TODO" [level=3] [ref=e85]
+            - generic [ref=e86]:
+              - button " Concluir" [ref=e87] [cursor=pointer]:
+                - generic [ref=e88] [cursor=pointer]: 
+                - text: Concluir
+              - button " Editar" [ref=e89] [cursor=pointer]:
+                - generic [ref=e90] [cursor=pointer]: 
+                - text: Editar
+              - button " Excluir" [ref=e91] [cursor=pointer]:
+                - generic [ref=e92] [cursor=pointer]: 
+                - text: Excluir
+          - paragraph [ref=e93]: Descrição do TODO criado via teste de API
+          - generic [ref=e94]:
+            - generic [ref=e96]: "Criada em: 30/09/2025"
+            - generic [ref=e97]:
+              - generic [ref=e98]: 
+              - text: Pendente
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - heading "TODO Atualizado" [level=3] [ref=e101]
+            - generic [ref=e102]:
+              - button " Reabrir" [ref=e103] [cursor=pointer]:
+                - generic [ref=e104] [cursor=pointer]: 
+                - text: Reabrir
+              - button " Editar" [ref=e105] [cursor=pointer]:
+                - generic [ref=e106] [cursor=pointer]: 
+                - text: Editar
+              - button " Excluir" [ref=e107] [cursor=pointer]:
+                - generic [ref=e108] [cursor=pointer]: 
+                - text: Excluir
+          - paragraph [ref=e109]: Descrição atualizada
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - generic [ref=e112]: "Criada em: 30/09/2025"
+              - generic [ref=e113]: "Concluída em: 30/09/2025"
+            - generic [ref=e114]:
+              - generic [ref=e115]: 
+              - text: Concluída
+        - generic [ref=e116]:
+          - generic [ref=e117]:
+            - heading "Nova Tarefa de Teste" [level=3] [ref=e118]
+            - generic [ref=e119]:
+              - button " Concluir" [ref=e120] [cursor=pointer]:
+                - generic [ref=e121] [cursor=pointer]: 
+                - text: Concluir
+              - button " Editar" [ref=e122] [cursor=pointer]:
+                - generic [ref=e123] [cursor=pointer]: 
+                - text: Editar
+              - button " Excluir" [ref=e124] [cursor=pointer]:
+                - generic [ref=e125] [cursor=pointer]: 
+                - text: Excluir
+          - paragraph [ref=e126]: Descrição da nova tarefa criada pelo teste
+          - generic [ref=e127]:
+            - generic [ref=e129]: "Criada em: 30/09/2025"
+            - generic [ref=e130]:
+              - generic [ref=e131]: 
+              - text: Pendente
+      - text: 
+  - text:   
+```
