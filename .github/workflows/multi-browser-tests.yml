@@ -94,7 +94,37 @@ jobs:
 
     - name: 🧪 Run Playwright tests on ${{ matrix.browser }}
       working-directory: tests
-      run: npx playwright test --project=${{ matrix.browser }} --reporter=html
+      run: |
+        # Create a simple config for this browser only
+        cat > playwright-${{ matrix.browser }}.config.js << 'EOF'
+        import { defineConfig } from '@playwright/test';
+
+        export default defineConfig({
+          testDir: './e2e',
+          fullyParallel: false,
+          retries: 1,
+          workers: 1,
+          reporter: 'html',
+          timeout: 60000,
+          use: {
+            baseURL: 'http://localhost:5146',
+            headless: true,
+            screenshot: 'only-on-failure',
+            video: 'retain-on-failure',
+          },
+          projects: [
+            {
+              name: process.env.BROWSER_NAME,
+              use: { 
+                ...process.env.BROWSER_NAME === 'chromium' ? { channel: 'chromium' } : {},
+                viewport: { width: 1280, height: 720 }
+              },
+            },
+          ],
+        });
+        EOF
+        
+        BROWSER_NAME=${{ matrix.browser }} npx playwright test --project=${{ matrix.browser }} --config=playwright-${{ matrix.browser }}.config.js --reporter=html
       env:
         CI: true
         PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.browser }}
