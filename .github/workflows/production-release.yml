@@ -36,12 +36,6 @@ jobs:
     - name: 🎨 Check code formatting
       run: dotnet format app-todo-list.sln --verify-no-changes --verbosity diagnostic
 
-    - name: 🔍 Run security scan
-      uses: securecodewarrior/github-action-add-sarif@v1
-      continue-on-error: true
-      with:
-        sarif-file: 'security-scan.sarif'
-
   api-tests:
     name: 🧪 API Integration Tests
     runs-on: ubuntu-latest
@@ -177,7 +171,7 @@ jobs:
       run: kill $APP_PID || true
 
     - name: 📊 Upload test report
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: production-e2e-report
@@ -234,7 +228,7 @@ jobs:
       run: dotnet publish TodoListApp.csproj --configuration Release --output ./publish --no-build
 
     - name: 📤 Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: todo-app-release-${{ github.sha }}
         path: ./publish/

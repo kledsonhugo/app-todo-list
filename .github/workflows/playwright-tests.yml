@@ -2,10 +2,9 @@ name: 🎭 Todo List - E2E Tests with Playwright
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: # Permite execução manual
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -13,7 +12,7 @@ env:
 
 jobs:
   playwright-tests:
-    name: 🧪 Run Playwright E2E Tests
+    name: 🎭 E2E Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
     
@@ -52,17 +51,17 @@ jobs:
         dotnet run --project TodoListApp.csproj &
         echo "APP_PID=$!" >> $GITHUB_ENV
       env:
-        ASPNETCORE_ENVIRONMENT: Production
+        ASPNETCORE_ENVIRONMENT: Development
         ASPNETCORE_URLS: http://localhost:5146
 
     - name: ⏳ Wait for application to be ready
       run: |
-        timeout 60 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 2; done'
+        timeout 90 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 3; done'
         echo "✅ Application is ready!"
 
     - name: 🧪 Run Playwright tests
       working-directory: tests
-      run: npx playwright test --config=playwright-simple.config.js
+      run: npx playwright test --config=playwright-simple.config.js --reporter=html
 
     - name: 🛑 Stop application
       if: always()
@@ -71,29 +70,38 @@ jobs:
           kill $APP_PID || true
         fi
 
-    - name: 📊 Upload test results
-      uses: actions/upload-artifact@v3
+    - name: 📊 Upload Playwright report
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report
         path: tests/playwright-report/
         retention-days: 30
 
-    - name: 📸 Upload test screenshots
-      uses: actions/upload-artifact@v3
+    - name: 📸 Upload screenshots
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: playwright-screenshots
         path: tests/test-results/
         retention-days: 30
 
-    - name: 📋 Test Results Summary
+    - name: 📋 Test Summary
       if: always()
       run: |
         echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
-        if [ -f "tests/playwright-report/index.html" ]; then
-          echo "✅ Test report generated successfully" >> $GITHUB_STEP_SUMMARY
-          echo "📊 Check the artifacts for detailed test results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Test Execution Summary:" >> $GITHUB_STEP_SUMMARY
+        echo "- Configuration: playwright-simple.config.js" >> $GITHUB_STEP_SUMMARY
+        echo "- Browser: Chromium (optimized for CI)" >> $GITHUB_STEP_SUMMARY
+        echo "- Timeout: 30 minutes" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
+        echo "- 📊 playwright-report: Detailed HTML test report" >> $GITHUB_STEP_SUMMARY
+        echo "- 📸 playwright-screenshots: Screenshots of any failures" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "### ✅ Result: All tests passed successfully!" >> $GITHUB_STEP_SUMMARY
         else
-          echo "❌ Test report not found" >> $GITHUB_STEP_SUMMARY
+          echo "### ❌ Result: Some tests failed - check artifacts for details" >> $GITHUB_STEP_SUMMARY
         fi

@@ -106,7 +106,7 @@ jobs:
         fi
 
     - name: 📊 Upload test results for ${{ matrix.browser }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report-${{ matrix.browser }}
@@ -114,7 +114,7 @@ jobs:
         retention-days: 30
 
     - name: 📸 Upload screenshots for ${{ matrix.browser }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: playwright-screenshots-${{ matrix.browser }}
