@@ -61,7 +61,7 @@ jobs:
 
     - name: 🧪 Run Playwright tests
       working-directory: tests
-      run: npx playwright test --config=playwright-simple.config.js --reporter=html
+      run: npx playwright test --config=playwright-ci.config.js --reporter=html
 
     - name: 🛑 Stop application
       if: always()
@@ -92,7 +92,7 @@ jobs:
         echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Test Execution Summary:" >> $GITHUB_STEP_SUMMARY
-        echo "- Configuration: playwright-simple.config.js" >> $GITHUB_STEP_SUMMARY
+        echo "- Configuration: playwright-ci.config.js (headless mode)" >> $GITHUB_STEP_SUMMARY
         echo "- Browser: Chromium (optimized for CI)" >> $GITHUB_STEP_SUMMARY
         echo "- Timeout: 30 minutes" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY

@@ -94,7 +94,7 @@ jobs:
 
     - name: 🧪 Run Playwright tests on ${{ matrix.browser }}
       working-directory: tests
-      run: npx playwright test --project=${{ matrix.browser }} --reporter=html
+      run: npx playwright test --project=${{ matrix.browser }} --config=playwright-ci.config.js --reporter=html
       env:
         PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.browser }}
 
