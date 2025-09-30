@@ -24,7 +24,7 @@ env:
 
 jobs:
   test-strategy:
-    name: 🎯 Define Test Strategy
+    name: Playwright Test Strategy
     runs-on: ubuntu-latest
     outputs:
       browsers: ${{ steps.browsers.outputs.list }}
