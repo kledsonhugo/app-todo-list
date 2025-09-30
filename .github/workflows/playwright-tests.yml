@@ -61,9 +61,10 @@ jobs:
 
     - name: 🧪 Run Playwright tests
       working-directory: tests
-      run: npx playwright test --config=playwright-chromium.config.js --reporter=html
+      run: npx playwright test --config=playwright-chromium.config.js --reporter=html --workers=4
       env:
         CI: true
+        PLAYWRIGHT_WORKERS: 4
 
     - name: 🛑 Stop application
       if: always()

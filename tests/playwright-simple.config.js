@@ -4,7 +4,9 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true, // Permitir paralelização total
   retries: process.env.CI ? 2 : 1, // Mais retries em CI
-  workers: process.env.CI ? 1 : '25%', // 1 worker em CI (múltiplos browsers), 25% localmente
+  workers: process.env.CI 
+    ? (process.env.PLAYWRIGHT_WORKERS || 4) // 4 workers em CI ou valor personalizado
+    : '25%', // 25% localmente
   reporter: process.env.CI ? [['html'], ['github']] : 'list',
   timeout: 90000, // Timeout maior para acomodar todos os browsers
   expect: {
@@ -60,10 +62,6 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
         actionTimeout: 25000,
         launchOptions: {
-          args: [
-            '--no-sandbox',
-            '--disable-dev-shm-usage'
-          ],
           firefoxUserPrefs: {
             'dom.ipc.processCount': 1,
             'browser.cache.disk.enable': false,
@@ -77,11 +75,10 @@ export default defineConfig({
       use: { 
         ...devices['Desktop Safari'],
         actionTimeout: 30000,
+        // WebKit não suporta argumentos do Chrome - usar configuração limpa
         launchOptions: {
-          args: [
-            '--no-sandbox',
-            '--disable-dev-shm-usage'
-          ]
+          // Argumentos mínimos apenas para headless mode
+          args: ['--headless']
         }
       },
     },

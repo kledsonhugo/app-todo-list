@@ -4,7 +4,9 @@ export default defineConfig({
   testDir: './e2e',
   fullyParallel: true, // Permitir paralelização total
   retries: process.env.CI ? 2 : 1, // Mais retries em CI
-  workers: process.env.CI ? 2 : '50%', // 2 workers em CI, 50% dos cores localmente
+  workers: process.env.CI 
+    ? (process.env.PLAYWRIGHT_WORKERS || 4) // 4 workers em CI ou valor personalizado
+    : '50%', // 50% dos cores localmente
   reporter: process.env.CI ? [['html'], ['github']] : 'list',
   timeout: 45000, // Timeout otimizado
   use: {
