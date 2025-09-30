@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
@@ -17,20 +17,21 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { 
-        channel: 'chromium',
+        ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 }
       },
     },
     {
       name: 'firefox',
       use: { 
-        channel: 'firefox',
+        ...devices['Desktop Firefox'],
         viewport: { width: 1280, height: 720 }
       },
     },
     {
       name: 'webkit',
       use: { 
+        ...devices['Desktop Safari'],
         viewport: { width: 1280, height: 720 }
       },
     },
