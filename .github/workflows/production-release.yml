@@ -164,7 +164,9 @@ jobs:
 
     - name: 🧪 Run E2E tests
       working-directory: tests
-      run: npx playwright test --config=playwright-ci.config.js --reporter=html
+      run: npx playwright test --config=playwright-simple.config.js --reporter=html
+      env:
+        CI: true
 
     - name: 🛑 Stop application
       if: always()
