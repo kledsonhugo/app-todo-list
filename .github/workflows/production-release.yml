@@ -164,7 +164,7 @@ jobs:
 
     - name: 🧪 Run E2E tests
       working-directory: tests
-      run: npx playwright test --config=playwright-simple.config.js --reporter=html
+      run: npx playwright test --config=playwright-chromium.config.js --reporter=html
       env:
         CI: true
 
@@ -251,7 +251,7 @@ jobs:
         echo "### ✅ Completed Stages:" >> $GITHUB_STEP_SUMMARY
         echo "- Code Quality & Formatting" >> $GITHUB_STEP_SUMMARY
         echo "- API Integration Tests" >> $GITHUB_STEP_SUMMARY  
-        echo "- E2E Production Tests" >> $GITHUB_STEP_SUMMARY
+        echo "- E2E Production Tests (Chromium optimized)" >> $GITHUB_STEP_SUMMARY
         echo "- Security Analysis" >> $GITHUB_STEP_SUMMARY
         echo "- Release Artifacts" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
