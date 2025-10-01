@@ -360,4 +360,238 @@ test.describe('Todo List Application', () => {
     const remainingItems = page.locator('.todo-item').filter({ hasText: uniqueTitle });
     await expect(remainingItems).toHaveCount(0);
   });
+
+  test('deve editar uma tarefa existente', async ({ page }) => {
+    // Aguardar que as tarefas carreguem completamente
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(3000);
+    
+    // Criar uma tarefa específica para edição
+    const originalTitle = `Tarefa Original ${Date.now()}`;
+    await page.fill('#todoTitle', originalTitle);
+    await page.fill('#todoDescription', 'Descrição original');
+    await page.click('button[type="submit"]');
+    
+    // Aguardar que a tarefa seja criada
+    await page.waitForSelector(`text="${originalTitle}"`, { timeout: 10000 });
+    await page.waitForTimeout(2000);
+    
+    // Localizar a tarefa e clicar no botão de editar
+    const todoItem = page.locator('.todo-item').filter({ hasText: originalTitle });
+    const editButton = todoItem.locator('.edit-btn');
+    await editButton.scrollIntoViewIfNeeded();
+    await editButton.click({ force: true });
+    
+    // Aguardar que o modal apareça
+    await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
+    await expect(page.locator('#editModal')).toBeVisible();
+    
+    // Modificar os campos do formulário
+    const updatedTitle = `Tarefa Editada ${Date.now()}`;
+    await page.fill('#editTodoTitle', updatedTitle);
+    await page.fill('#editTodoDescription', 'Descrição atualizada');
+    
+    // Salvar as alterações
+    await page.locator('#editTodoForm button[type="submit"]').click();
+    
+    // Aguardar que o modal feche
+    await expect(page.locator('#editModal')).toHaveClass(/hidden/);
+    
+    // Aguardar um pouco para a atualização
+    await page.waitForTimeout(2000);
+    
+    // Verificar se a tarefa foi atualizada na lista
+    await expect(page.locator(`text="${updatedTitle}"`).first()).toBeVisible();
+  });
+
+  test('deve fechar o modal de edição com o botão Cancelar', async ({ page }) => {
+    // Aguardar que as tarefas carreguem
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+    
+    // Clicar no botão de editar da primeira tarefa
+    const editButton = page.locator('.todo-item .edit-btn').first();
+    await editButton.scrollIntoViewIfNeeded();
+    await editButton.click({ force: true });
+    
+    // Aguardar que o modal apareça
+    await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
+    await expect(page.locator('#editModal')).toBeVisible();
+    
+    // Clicar no botão Cancelar
+    await page.locator('#cancelEdit').click();
+    
+    // Verificar se o modal foi fechado
+    await expect(page.locator('#editModal')).toHaveClass(/hidden/);
+  });
+
+  test('deve fechar o modal de edição ao clicar fora dele', async ({ page }) => {
+    // Aguardar que as tarefas carreguem
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+    
+    // Clicar no botão de editar da primeira tarefa
+    const editButton = page.locator('.todo-item .edit-btn').first();
+    await editButton.scrollIntoViewIfNeeded();
+    await editButton.click({ force: true });
+    
+    // Aguardar que o modal apareça
+    await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
+    await expect(page.locator('#editModal')).toBeVisible();
+    
+    // Clicar fora do modal (no backdrop)
+    await page.locator('#editModal').click({ position: { x: 5, y: 5 } });
+    
+    // Verificar se o modal foi fechado
+    await expect(page.locator('#editModal')).toHaveClass(/hidden/);
+  });
+
+  test('deve exibir toast de sucesso após criar tarefa', async ({ page }) => {
+    // Aguardar que a página carregue
+    await page.waitForSelector('#addTodoForm');
+    await page.waitForTimeout(2000);
+    
+    // Criar uma nova tarefa
+    const uniqueTitle = `Tarefa Toast ${Date.now()}`;
+    await page.fill('#todoTitle', uniqueTitle);
+    await page.fill('#todoDescription', 'Teste de toast');
+    await page.click('button[type="submit"]');
+    
+    // Aguardar um pouco para a criação e toast aparecer
+    await page.waitForTimeout(1500);
+    
+    // Verificar se o toast aparece com a classe 'show' (pode ser 'toast success show' ou similar)
+    const toast = page.locator('#toast');
+    // Verificar se o toast tem a classe show OU se está visível
+    const hasShow = await toast.evaluate((el) => el.classList.contains('show'));
+    const isVisible = await toast.isVisible();
+    
+    // O toast deve ter show ou estar visível
+    expect(hasShow || isVisible).toBe(true);
+    
+    // Verificar a mensagem do toast
+    const toastMessage = page.locator('#toastMessage');
+    await expect(toastMessage).toContainText('sucesso');
+    
+    // Se o toast ainda estiver visível, testar o botão de fechar
+    if (isVisible || hasShow) {
+      const closeButton = page.locator('#closeToast');
+      const isButtonVisible = await closeButton.isVisible();
+      if (isButtonVisible) {
+        await closeButton.click();
+        await page.waitForTimeout(500);
+        
+        // Verificar se o toast foi fechado
+        const hasShowAfterClose = await toast.evaluate((el) => el.classList.contains('show'));
+        expect(hasShowAfterClose).toBe(false);
+      }
+    }
+  });
+
+  test('deve exibir mensagem quando não há tarefas (filtro)', async ({ page }) => {
+    // Aguardar que a página carregue
+    await page.waitForSelector('#todosList', { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+    
+    // Garantir que todas as tarefas estejam concluídas primeiro
+    // Concluir todas as tarefas
+    const toggleButtons = page.locator('.todo-item .toggle-btn').filter({ hasText: 'Concluir' });
+    const count = await toggleButtons.count();
+    
+    for (let i = 0; i < count; i++) {
+      try {
+        const btn = page.locator('.todo-item .toggle-btn').filter({ hasText: 'Concluir' }).first();
+        if (await btn.count() > 0) {
+          await btn.click({ force: true });
+          await page.waitForTimeout(1000);
+        }
+      } catch (error) {
+        // Continue se houver erro
+      }
+    }
+    
+    // Agora filtrar por pendentes - não deve haver nenhuma tarefa pendente
+    await page.locator('[data-filter="pending"]').click({ force: true });
+    await page.waitForTimeout(2000);
+    
+    // Verificar se a mensagem de lista vazia aparece ou se não há tarefas visíveis
+    const todoItems = page.locator('.todo-item');
+    const todoCount = await todoItems.count();
+    const emptyMessage = page.locator('#emptyMessage');
+    const isEmptyVisible = await emptyMessage.isVisible();
+    
+    // Ou não há tarefas visíveis OU a mensagem de vazio está visível
+    expect(todoCount === 0 || isEmptyVisible).toBe(true);
+    
+    // Se a mensagem estiver visível, verificar o texto
+    if (isEmptyVisible) {
+      await expect(emptyMessage).toContainText('Nenhuma tarefa encontrada');
+    }
+  });
+
+  test('deve validar título obrigatório ao criar tarefa', async ({ page }) => {
+    // Aguardar que o formulário esteja disponível
+    await page.waitForSelector('#addTodoForm');
+    await page.waitForTimeout(1000);
+    
+    // Tentar submeter o formulário sem título
+    await page.fill('#todoTitle', '');
+    await page.fill('#todoDescription', 'Descrição sem título');
+    
+    // Clicar no botão de submit
+    await page.click('button[type="submit"]');
+    
+    // Aguardar um pouco
+    await page.waitForTimeout(1000);
+    
+    // Verificar se o toast de erro aparece
+    const toast = page.locator('#toast');
+    const toastMessage = page.locator('#toastMessage');
+    
+    // Verificar se há feedback de validação (HTML5 ou toast)
+    const titleInput = page.locator('#todoTitle');
+    const isInvalid = await titleInput.evaluate((el) => !el.checkValidity());
+    
+    // O campo deve ser inválido devido ao required
+    expect(isInvalid).toBe(true);
+  });
+
+  test('deve validar título obrigatório ao editar tarefa', async ({ page }) => {
+    // Aguardar que as tarefas carreguem
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+    
+    // Clicar no botão de editar da primeira tarefa
+    const editButton = page.locator('.todo-item .edit-btn').first();
+    await editButton.scrollIntoViewIfNeeded();
+    await editButton.click({ force: true });
+    
+    // Aguardar que o modal apareça
+    await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
+    await expect(page.locator('#editModal')).toBeVisible();
+    
+    // Limpar o título
+    await page.fill('#editTodoTitle', '');
+    
+    // Tentar salvar
+    await page.locator('#editTodoForm button[type="submit"]').click();
+    
+    // Aguardar um pouco
+    await page.waitForTimeout(1000);
+    
+    // Verificar se há feedback de validação
+    const titleInput = page.locator('#editTodoTitle');
+    const isInvalid = await titleInput.evaluate((el) => !el.checkValidity());
+    
+    // O campo deve ser inválido devido ao required
+    expect(isInvalid).toBe(true);
+    
+    // O modal deve continuar aberto
+    await expect(page.locator('#editModal')).toBeVisible();
+  });
 });

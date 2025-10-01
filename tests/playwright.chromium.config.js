@@ -13,7 +13,7 @@ export default defineConfig({
     baseURL: 'http://localhost:5146',
     headless: true, // Modo headless sempre
     screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    video: 'off', // Disable video to avoid ffmpeg dependency
     // Configurações de performance
     actionTimeout: 15000,
     navigationTimeout: 30000,
