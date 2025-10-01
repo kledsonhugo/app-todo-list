@@ -63,7 +63,7 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        cache-dependency-path: 'tests/package-lock.json'
+        cache-dependency-path: 'tests/package.json'
 
     - name: 📦 Restore .NET dependencies
       run: dotnet restore app-todo-list.sln
@@ -73,7 +73,7 @@ jobs:
 
     - name: 📦 Install Node.js dependencies
       working-directory: tests
-      run: npm ci
+      run: npm install
 
     - name: 🎭 Install Playwright browsers
       working-directory: tests

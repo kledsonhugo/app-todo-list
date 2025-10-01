@@ -139,13 +139,13 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
-        cache-dependency-path: 'tests/package-lock.json'
+        cache-dependency-path: 'tests/package.json'
 
     - name: 📦 Install dependencies
       run: |
         dotnet restore app-todo-list.sln
         dotnet build app-todo-list.sln --no-restore --configuration Release
-        cd tests && npm ci
+        cd tests && npm install
 
     - name: 🎭 Install Playwright
       working-directory: tests
