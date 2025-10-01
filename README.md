@@ -1,40 +1,6 @@
 # 🚀 Todo List API - Full-Stack Application
 
-Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas com interface web moderna, testes automatizados E2E e CI/CD otimizado.
-
-## ✨ Características Principais
-
-- 🎯 **API REST Completa** - ASP.NET Core Web API com Swagger/OpenAPI
-- 🌐 **Interface Web Moderna** - HTML5, CSS3, JavaScript ES6+ responsivo
-- 🧪 **Testes E2E Automatizados** - Playwright multi-browser com paralelização
-- 🚀 **CI/CD Otimizado** - GitHub Actions com 3 pipelines especializados
-- ⚡ **Performance Otimizada** - Workers paralelos e configurações por ambiente
-- 🔒 **Segurança Integrada** - Scans automáticos e validação de código
-- 📊 **Monitoramento Completo** - Relatórios detalhados e artefatos
-
-## 🎯 Funcionalidades
-
-### 🌐 Interface Web
-- ✅ **Interface Responsiva** - Design moderno com gradients e animações
-- ✅ **CRUD Completo** - Criar, ler, atualizar e deletar tarefas
-- ✅ **Filtros Inteligentes** - Todas, Pendentes, Concluídas com contadores
-- ✅ **Edição Modal** - Interface elegante para modificar tarefas
-- ✅ **Notificações Toast** - Feedback visual em tempo real
-- ✅ **Mobile First** - Otimizado para dispositivos móveis
-
-### 🔧 API REST
-- ✅ **Endpoints RESTful** - Padrões de API bem definidos
-- ✅ **Documentação Swagger** - Interface interativa para testes
-- ✅ **Validação de Dados** - DTOs com validação robusta
-- ✅ **CORS Configurado** - Acesso cross-origin habilitado
-- ✅ **Status Codes Adequados** - Respostas HTTP semânticas
-
-### 🧪 Testes & Qualidade
-- ✅ **Testes E2E** - Playwright com cobertura completa da aplicação
-- ✅ **Multi-Browser** - Suporte a Chromium, Firefox e WebKit
-- ✅ **Paralelização** - 4 workers para execução otimizada
-- ✅ **CI/CD Robusto** - 3 pipelines especializados
-- ✅ **Security Scans** - Análise automática de vulnerabilidades
+Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas com interface web moderna.
 
 ## Acesso Rápido
 
@@ -58,18 +24,17 @@ Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas
 │   └── script.js           # JavaScript da aplicação
 ├── tests/                # Test Suite
 │   ├── e2e/                # Testes End-to-End
-│   │   ├── api.spec.js       # Testes da API
-│   │   └── todo-app.spec.js  # Testes da interface
+│   │   ├── api.spec.js       # Testes da API (8 cenários)
+│   │   └── todo-app.spec.js  # Testes da interface (8 cenários)
 │   ├── playwright-chromium.config.js  # Config otimizada CI
-│   ├── playwright-simple.config.js    # Config multi-browser
-│   └── docs/               # Documentação de testes
+│   ├── playwright-simple.config.js    # Config local multi-browser
+│   ├── package.json        # Dependências e scripts de teste
+│   └── package-lock.json   # Lock das dependências
 ├── .github/workflows/    # CI/CD Pipelines
 │   ├── playwright-tests.yml        # Pipeline principal E2E
 │   ├── multi-browser-tests.yml     # Pipeline multi-browser
 │   └── production-release.yml      # Pipeline de produção
-├── docs/                 # Documentação do projeto
-├── Program.cs            # Configuração da aplicação
-└── TodoListApp.http      # Exemplos de requisições HTTP
+└── Program.cs            # Configuração da aplicação
 ```
 
 ## 🚀 Como Executar
@@ -91,11 +56,6 @@ dotnet restore app-todo-list.sln
 dotnet run --project TodoListApp.csproj
 ```
 
-### 🌐 Acessos
-- **Interface Web:** http://localhost:5146
-- **API Swagger:** http://localhost:5146/swagger
-- **API Docs:** Disponível via Swagger UI
-
 ### 🧪 Executar Testes (Opcional)
 ```bash
 # 1. Instalar dependências de teste
@@ -104,33 +64,15 @@ cd tests && npm install
 # 2. Instalar browsers Playwright
 npx playwright install
 
-# 3. Executar testes (com app rodando)
+# 3. Executar testes locais otimizados (Chromium + Firefox)
+npx playwright test --config=playwright-simple.config.js
+
+# 4. Executar testes CI (apenas Chromium - mais rápido)
 npx playwright test --config=playwright-chromium.config.js
 
-# 4. Executar testes multi-browser
-npx playwright test --config=playwright-simple.config.js
+# 5. Visualizar relatório dos testes
+npx playwright show-report
 ```
-
-### ☁️ Azure Playwright Workspaces
-Este projeto também suporta execução de testes com **Azure Playwright Workspaces** para testes em escala na nuvem:
-
-```bash
-# Executar testes no Azure Playwright Workspaces
-npx playwright test --config=playwright.service.config.ts --workers=20
-```
-
-**Benefícios do Azure Playwright Workspaces:**
-- ⚡ **20 workers paralelos** na nuvem
-- 🌐 **Multi-browser completo** (Chromium, Firefox, WebKit, Mobile)
-- 📊 **Relatórios integrados** no Azure Portal
-- 🚀 **Infraestrutura escalável** e gerenciada
-- 💰 **Execução otimizada** com controle de custos
-
-**Workflows Automatizados:**
-- `azure-playwright-tests.yml` - Testes rápidos em Push/PR
-- `azure-multi-browser-tests.yml` - Testes completos agendados
-
-📚 **Configuração completa:** [docs/AZURE-PLAYWRIGHT-SETUP.md](docs/AZURE-PLAYWRIGHT-SETUP.md)
 
 ## Interface Web
 
@@ -279,10 +221,8 @@ Este projeto possui uma estratégia robusta de CI/CD com 3 pipelines especializa
 ## 🧪 Testes Automatizados
 
 ### 📋 Cobertura de Testes
-- **16 testes E2E** cobrindo toda a aplicação
-- **API Tests** - Todos os endpoints REST
-- **UI Tests** - Interface web completa
-- **Multi-Browser** - Compatibilidade garantida
+- **Testes E2E** cobrindo toda a aplicação (8 API + 8 UI)
+- **API Tests** - Todos os endpoints REST com validação completa
 
 ### 🎯 Cenários Testados
 - ✅ Carregamento da página principal
@@ -295,85 +235,6 @@ Este projeto possui uma estratégia robusta de CI/CD com 3 pipelines especializa
 - ✅ Atualização da lista
 - ✅ Validação de API (CRUD completo)
 - ✅ Tratamento de erros
-
-### 🔧 Configurações de Teste
-- **Local Development:** 50% cores (Chromium) / 25% cores (Multi-browser)
-- **CI Environment:** 4 workers fixos para máxima performance
-- **Timeouts:** Otimizados por browser (15s-30s)
-- **Retry Strategy:** 2 tentativas em CI para confiabilidade
-
-## 📚 Documentação Completa
-
-### �️ Documentos Disponíveis
-- **`docs/CI-CD-PIPELINES.md`** - Detalhes completos dos pipelines
-- **`docs/PERFORMANCE-OPTIMIZATION.md`** - Otimizações de performance implementadas
-- **`docs/MULTI-BROWSER-FIXES.md`** - Correções para compatibilidade multi-browser
-- **`docs/GITHUB-ACTIONS-OPTIMIZATION.md`** - Melhorias no GitHub Actions
-- **`docs/PLAYWRIGHT-CONFIGS.md`** - Estratégias de configuração dos testes
-- **`tests/CI-WORKERS-FIX.md`** - Correção da configuração de workers
-- **`INTERFACE_WEB.md`** - Guia detalhado da interface web
-- **`TESTE.md`** - Instruções de teste da API
-
-### 🎯 Para Desenvolvedores
-```bash
-# Executar apenas testes da API
-npx playwright test tests/e2e/api.spec.js
-
-# Executar apenas testes da UI
-npx playwright test tests/e2e/todo-app.spec.js
-
-# Executar com browser específico
-npx playwright test --project=firefox
-
-# Gerar relatório HTML
-npx playwright test --reporter=html
-```
-
-### � Para DevOps
-```bash
-# Verificar configuração de workers
-PLAYWRIGHT_WORKERS=4 CI=true npx playwright test --dry-run
-
-# Testar pipeline localmente
-act -j playwright-tests
-
-# Validar configurações
-dotnet format app-todo-list.sln --verify-no-changes
-```
-
-## 🔮 Próximos Passos
-
-### 🎯 Roadmap de Funcionalidades
-- [ ] **Persistência** - Entity Framework Core + PostgreSQL
-- [ ] **Autenticação** - JWT + Identity
-- [ ] **Paginação** - Listagem otimizada
-- [ ] **Busca Avançada** - Full-text search
-- [ ] **Categorias/Tags** - Organização melhorada
-- [ ] **Notificações** - Push notifications
-- [ ] **PWA** - Modo offline
-- [ ] **Docker** - Containerização
-
-### 🚀 Melhorias Técnicas
-- [ ] **Cache Redis** - Performance de API
-- [ ] **Rate Limiting** - Proteção contra abuse
-- [ ] **Health Checks** - Monitoramento
-- [ ] **Logging Estruturado** - Observabilidade
-- [ ] **Metrics** - Prometheus + Grafana
-- [ ] **Load Testing** - K6 + Artillery
-
-### 🧪 Qualidade & Testes
-- [ ] **Unit Tests** - xUnit + Moq
-- [ ] **Integration Tests** - WebApplicationFactory
-- [ ] **Load Tests** - Testes de carga automatizados
-- [ ] **Security Tests** - OWASP ZAP integration
-- [ ] **Accessibility Tests** - axe-core integration
-
-## 📄 Dados de Exemplo
-
-A aplicação inicia com 3 tarefas de exemplo:
-1. **"Estudar .NET"** (pendente)
-2. **"Fazer exercícios"** (concluída)  
-3. **"Ler documentação"** (pendente)
 
 ## 📜 Licença
 
