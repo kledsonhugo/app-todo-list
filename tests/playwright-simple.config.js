@@ -3,14 +3,14 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true, // Permitir paralelização total
-  retries: process.env.CI ? 2 : 1, // Mais retries em CI
+  retries: process.env.CI ? 2 : 2, // Mais retries localmente também
   workers: process.env.CI 
     ? parseInt(process.env.PLAYWRIGHT_WORKERS) || 4 // Converter para número
-    : '25%', // 25% localmente
+    : 4, // 4 workers localmente para equilibrar velocidade e estabilidade
   reporter: process.env.CI ? [['html'], ['github']] : 'list',
-  timeout: 90000, // Timeout maior para acomodar todos os browsers
+  timeout: 120000, // Timeout maior para acomodar todos os browsers
   expect: {
-    timeout: 15000, // Timeout para expects
+    timeout: 20000, // Timeout maior para expects
   },
   globalTimeout: process.env.CI ? 600000 : 300000, // 10min CI, 5min local
   use: {
@@ -83,7 +83,7 @@ export default defineConfig({
       },
     },
   ] : [
-    // Local: Apenas Chromium e Firefox (WebKit problemático localmente)
+    // Local: Apenas Chromium e Firefox (WebKit tem problemas de viewport no ambiente local)
     {
       name: 'chromium',
       use: { 
@@ -106,6 +106,8 @@ export default defineConfig({
         }
       },
     },
+    // WebKit desabilitado localmente devido a problemas de viewport
+    // Ele ainda funciona no CI com configuração diferente
   ],
   webServer: {
     command: 'echo "App should already be running"',

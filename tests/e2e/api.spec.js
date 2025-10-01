@@ -44,7 +44,18 @@ test.describe('Todo List API Tests', () => {
   test('deve obter um TODO específico via API', async ({ request }) => {
     // Primeiro, listar todos os TODOs para obter um ID
     const listResponse = await request.get(`${baseURL}/api/todos`);
-    const todos = await listResponse.json();
+    expect(listResponse.status()).toBe(200);
+    
+    // Verificar se a resposta é válida antes de fazer parse
+    const responseText = await listResponse.text();
+    let todos;
+    try {
+      todos = JSON.parse(responseText);
+    } catch (error) {
+      throw new Error(`Failed to parse JSON response: ${responseText.substring(0, 100)}...`);
+    }
+    
+    expect(todos.length).toBeGreaterThan(0);
     const todoId = todos[0].id;
 
     // Obter o TODO específico

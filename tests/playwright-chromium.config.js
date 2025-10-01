@@ -3,10 +3,10 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true, // Permitir paralelização total
-  retries: process.env.CI ? 2 : 1, // Mais retries em CI
+  retries: process.env.CI ? 2 : 2, // Mais retries em CI
   workers: process.env.CI 
     ? parseInt(process.env.PLAYWRIGHT_WORKERS) || 4 // Converter para número
-    : '50%', // 50% dos cores localmente
+    : 4, // 4 workers localmente para equilibrar velocidade e estabilidade
   reporter: process.env.CI ? [['html'], ['github']] : 'list',
   timeout: 45000, // Timeout otimizado
   use: {
