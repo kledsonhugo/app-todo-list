@@ -2,7 +2,7 @@ name: Testes Playwright - Production Release
 
 on:
   push:
-    branches: [ main ]
+    branches: [ prod ]
     tags: [ 'v*.*.*' ]
   pull_request:
     branches: [ main ]

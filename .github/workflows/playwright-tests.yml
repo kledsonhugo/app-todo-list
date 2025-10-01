@@ -2,7 +2,7 @@ name: Testes Playwright - E2E Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [ test ]
   pull_request:
     branches: [ main ]
 

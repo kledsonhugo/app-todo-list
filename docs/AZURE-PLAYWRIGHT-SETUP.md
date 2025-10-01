@@ -104,9 +104,21 @@ Anote as seguintes informações:
 4. Clique em **Generate token**
 5. Copie e armazene o token com segurança
 
-## Configuração dos GitHub Secrets
+## 🔑 Configuração dos GitHub Secrets
 
-No seu repositório GitHub:
+⚠️ **IMPORTANTE**: Antes de executar os workflows, você precisa configurar as credenciais Azure.
+
+### 🚀 Setup Rápido
+```bash
+# Execute o script automatizado na raiz do projeto
+./setup-azure-auth.sh
+```
+
+### 📚 Setup Detalhado
+Para instruções completas, consulte: **[docs/AZURE-CREDENTIALS-SETUP.md](AZURE-CREDENTIALS-SETUP.md)**
+
+### 🔑 Secrets Necessários
+No seu repositório GitHub → Settings → Secrets and variables → Actions:
 
 1. Vá para **Settings** > **Secrets and variables** > **Actions**
 2. Clique em **New repository secret**
