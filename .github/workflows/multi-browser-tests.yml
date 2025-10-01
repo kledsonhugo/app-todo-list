@@ -121,7 +121,7 @@ jobs:
       working-directory: tests
       run: |
         # Use optimized config with maximum parallelization for CI
-        npx playwright test --project=${{ matrix.browser }} --config=playwright-simple.config.js --reporter=html
+        npx playwright test --project=${{ matrix.browser }} --config=playwright.multi.config.js --reporter=html
       env:
         CI: true
         PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.browser }}

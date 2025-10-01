@@ -9,7 +9,11 @@
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
-    "report": "playwright show-report"
+    "report": "playwright show-report",
+    "test:local:chromium": "playwright test --config=playwright.chromium.config.js",
+    "test:local:multi": "playwright test --config=playwright.multi.config.js",
+    "test:azure:chromium": "playwright test --config=playwright.azure.chromium.config.ts",
+    "test:azure:multi": "playwright test --config=playwright.azure.multi.config.ts"
   },
   "devDependencies": {
     "@azure/identity": "^4.12.0",

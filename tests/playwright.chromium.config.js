@@ -11,7 +11,7 @@ export default defineConfig({
   timeout: 45000, // Timeout otimizado
   use: {
     baseURL: 'http://localhost:5146',
-    headless: process.env.CI ? true : false, // Headless em CI, headed localmente
+    headless: true, // Modo headless sempre
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     // Configurações de performance

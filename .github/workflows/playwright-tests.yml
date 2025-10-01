@@ -86,7 +86,7 @@ jobs:
 
     - name: 🧪 Run Playwright tests
       working-directory: tests
-      run: npx playwright test --config=playwright-chromium.config.js --reporter=html
+      run: npx playwright test --config=playwright.chromium.config.js --reporter=html
       env:
         CI: true
         PLAYWRIGHT_WORKERS: 4
@@ -120,7 +120,7 @@ jobs:
         echo "## 🎭 Playwright Test Results" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Test Execution Summary:" >> $GITHUB_STEP_SUMMARY
-        echo "- Configuration: playwright-chromium.config.js (CI=true, headless mode)" >> $GITHUB_STEP_SUMMARY
+        echo "- Configuration: playwright.chromium.config.js (CI=true, headless mode)" >> $GITHUB_STEP_SUMMARY
         echo "- Browser: Chromium only (optimized for CI)" >> $GITHUB_STEP_SUMMARY
         echo "- Timeout: 30 minutes" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY

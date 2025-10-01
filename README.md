@@ -26,7 +26,7 @@ Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas
 │   ├── e2e/                # Testes End-to-End
 │   │   ├── api.spec.js       # Testes da API (8 cenários)
 │   │   └── todo-app.spec.js  # Testes da interface (8 cenários)
-│   ├── playwright-chromium.config.js  # Config otimizada CI
+│   ├── playwright.chromium.config.js  # Config otimizada CI
 │   ├── playwright-simple.config.js    # Config local multi-browser
 │   ├── package.json        # Dependências e scripts de teste
 │   └── package-lock.json   # Lock das dependências
@@ -68,7 +68,7 @@ npx playwright install
 npx playwright test --config=playwright-simple.config.js
 
 # 4. Executar testes CI (apenas Chromium - mais rápido)
-npx playwright test --config=playwright-chromium.config.js
+npx playwright test --config=playwright.chromium.config.js
 
 # 5. Visualizar relatório dos testes
 npx playwright show-report
