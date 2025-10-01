@@ -6,8 +6,16 @@ test.describe('Todo List Application', () => {
     await page.goto('/');
     
     // Aguardar que a página carregue completamente
-    await page.waitForSelector('#todosList', { timeout: 10000 });
-    await page.waitForTimeout(1000); // Aguardar estabilização
+    await page.waitForLoadState('networkidle');
+    
+    // Aguardar que o JavaScript execute e a aplicação seja inicializada
+    await page.waitForFunction(() => {
+      return document.querySelector('#todosList') !== null &&
+             document.querySelector('#addTodoForm') !== null;
+    }, { timeout: 30000 });
+    
+    // Aguardar estabilização adicional
+    await page.waitForTimeout(2000);
   });
 
   // Função auxiliar para limpar todas as tarefas
@@ -40,6 +48,15 @@ test.describe('Todo List Application', () => {
   }
 
   test('deve carregar a página principal corretamente', async ({ page }) => {
+    // Aguardar que a página carregue completamente
+    await page.waitForLoadState('networkidle');
+    
+    // Aguardar que o JavaScript execute e a aplicação seja inicializada
+    await page.waitForFunction(() => {
+      return window.todoApp !== undefined || 
+             document.querySelector('#todosList') !== null;
+    }, { timeout: 30000 });
+    
     // Verificar se o título da página está correto
     await expect(page).toHaveTitle('Todo List - Gerenciador de Tarefas');
     

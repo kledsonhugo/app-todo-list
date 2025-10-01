@@ -56,12 +56,16 @@ jobs:
       working-directory: tests
       run: npm ci
 
+    - name: 🎭 Install Playwright browsers
+      working-directory: tests
+      run: npx playwright install --with-deps
+
     - name: 🚀 Start application in background
       run: |
         dotnet run --project TodoListApp.csproj &
         echo "APP_PID=$!" >> $GITHUB_ENV
       env:
-        ASPNETCORE_ENVIRONMENT: Development
+        ASPNETCORE_ENVIRONMENT: Production
         ASPNETCORE_URLS: http://localhost:5146
 
     - name: ⏳ Wait for application to be ready
@@ -71,11 +75,12 @@ jobs:
 
     - name: 🧪 Run Playwright tests with Azure Playwright Workspaces
       working-directory: tests
-      run: npx playwright test --config=playwright.service.config.ts --workers=20
+      run: npx playwright test --config=playwright.service.config.ts --reporter=html
       env:
         CI: true
         PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
         PLAYWRIGHT_WORKERS: 20
+        PLAYWRIGHT_HTML_REPORT: playwright-report-azure
 
     - name: 🛑 Stop application
       if: always()
@@ -89,7 +94,7 @@ jobs:
       if: always()
       with:
         name: azure-playwright-report
-        path: tests/playwright-report/
+        path: tests/playwright-report-azure/
         retention-days: 30
 
     - name: 📸 Upload screenshots

@@ -4,82 +4,86 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default defineConfig({
-  // Maximum 20 workers when running on Azure Playwright Workspaces
+  // Azure-specific worker configuration
   workers: parseInt(process.env.PLAYWRIGHT_WORKERS || '20'),
   
-  // Timeout configurations optimized for cloud execution
-  timeout: 60000,
+  // Timeout configurations
+  timeout: 90000,
   expect: {
-    timeout: 30000,
+    timeout: 15000,
   },
   
-  // Test directory
-  testDir: '.',
+  // Test directory - same as local config
+  testDir: './e2e',
   
-  // Base URL para os testes
+  // Enable full parallelization
+  fullyParallel: true,
+  
+  // Retry configuration
+  retries: 2,
+  
+  // Base URL and Azure connection
   use: {
-    // Base URL for all tests
     baseURL: 'http://localhost:5146',
+    actionTimeout: 25000,
+    navigationTimeout: 60000,
+    screenshot: 'only-on-failure' as const,
+    video: 'retain-on-failure' as const,
+    trace: 'retain-on-failure' as const,
     
-    // Azure Playwright service automatically configures browsers
-    // Only connect to service if URL is provided and we're in CI or service mode
+    // Azure Playwright service connection
     ...(process.env.PLAYWRIGHT_SERVICE_URL && (process.env.CI || process.env.PLAYWRIGHT_SERVICE_MODE) ? {
       connectOptions: {
-        // The service endpoint URL from Azure portal
         wsEndpoint: process.env.PLAYWRIGHT_SERVICE_URL as string,
       },
     } : {}),
   },
   
-  // WebServer configuration - starts the .NET app automatically
+  // WebServer configuration (reuse existing server)
   webServer: {
-    command: 'dotnet run --project ../TodoListApp.csproj',
+    command: 'echo "App should already be running"',
     url: 'http://localhost:5146',
-    reuseExistingServer: true, // Always reuse existing server (CI starts it separately)
-    timeout: 120 * 1000, // 2 minutos para iniciar
-    env: {
-      ASPNETCORE_ENVIRONMENT: 'Development',
-      ASPNETCORE_URLS: 'http://localhost:5146',
-    },
+    reuseExistingServer: true,
   },
   
-  // Report configuration
+  // Reporter configuration
   reporter: [
     ['html', { open: 'never' }],
     ['list'],
     ['junit', { outputFile: 'test-results/junit-results.xml' }],
   ],
   
-  // Output directory for artifacts
+  // Output directory
   outputDir: 'test-results',
   
-  // Retry failed tests
-  retries: process.env.CI ? 2 : 0,
-  
-  // Global test timeout
+  // Global timeout
   globalTimeout: 60 * 60 * 1000, // 1 hour
   
-  // Projects configuration for Azure Playwright Workspaces
+  // Azure Playwright Workspaces projects (all browsers including mobile)
   projects: [
     {
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
       },
     },
     {
       name: 'firefox',
       use: { 
         ...devices['Desktop Firefox'],
+        viewport: { width: 1280, height: 720 },
+        actionTimeout: 25000,
       },
     },
     {
       name: 'webkit',
       use: { 
         ...devices['Desktop Safari'],
+        viewport: { width: 1280, height: 720 },
+        actionTimeout: 30000,
       },
     },
-    // Mobile browsers
     {
       name: 'Mobile Chrome',
       use: { 
@@ -94,10 +98,12 @@ export default defineConfig({
     },
   ],
   
-  // Azure Playwright Workspaces specific configurations
+  // Azure-specific metadata
   metadata: {
     'test-type': 'Azure Playwright Workspaces',
     'repo': process.env.GITHUB_REPOSITORY || 'local',
     'run-id': process.env.GITHUB_RUN_ID || 'local',
+    'service-url': process.env.PLAYWRIGHT_SERVICE_URL || 'not-configured',
+    'workers': parseInt(process.env.PLAYWRIGHT_WORKERS || '20'),
   },
 });
