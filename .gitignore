@@ -52,3 +52,14 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Playwright
+tests/test-results/
+tests/playwright-report/
+tests/.env
+
+# Azure and Environment Variables
+.env
+.env.local
+.env.production
+.env.staging

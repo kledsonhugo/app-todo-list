@@ -1,0 +1,129 @@
+name: Azure Playwright Workspaces - E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Required permissions for Azure authentication via OIDC
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '18'
+
+jobs:
+  azure-playwright-tests:
+    name: 🎭 Azure Playwright Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🔐 Login to Azure
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: true
+
+    - name: 🔧 Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: tests/package-lock.json
+
+    - name: 📦 Restore .NET dependencies
+      run: dotnet restore app-todo-list.sln
+
+    - name: 🏗️ Build .NET application
+      run: dotnet build app-todo-list.sln --no-restore
+
+    - name: 📦 Install Node.js dependencies
+      working-directory: tests
+      run: npm ci
+
+    - name: 🚀 Start application in background
+      run: |
+        dotnet run --project TodoListApp.csproj &
+        echo "APP_PID=$!" >> $GITHUB_ENV
+      env:
+        ASPNETCORE_ENVIRONMENT: Development
+        ASPNETCORE_URLS: http://localhost:5146
+
+    - name: ⏳ Wait for application to be ready
+      run: |
+        timeout 90 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 3; done'
+        echo "✅ Application is ready!"
+
+    - name: 🧪 Run Playwright tests with Azure Playwright Workspaces
+      working-directory: tests
+      run: npx playwright test --config=playwright.service.config.ts --workers=20
+      env:
+        CI: true
+        PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
+        PLAYWRIGHT_WORKERS: 20
+
+    - name: 🛑 Stop application
+      if: always()
+      run: |
+        if [ ! -z "$APP_PID" ]; then
+          kill $APP_PID || true
+        fi
+
+    - name: 📊 Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: azure-playwright-report
+        path: tests/playwright-report/
+        retention-days: 30
+
+    - name: 📸 Upload screenshots
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: azure-playwright-screenshots
+        path: tests/test-results/
+        retention-days: 30
+
+    - name: 📋 Test Summary
+      if: always()
+      run: |
+        echo "## 🎭 Azure Playwright Workspaces Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Test Execution Summary:" >> $GITHUB_STEP_SUMMARY
+        echo "- Service: Azure Playwright Workspaces" >> $GITHUB_STEP_SUMMARY
+        echo "- Configuration: playwright.service.config.ts" >> $GITHUB_STEP_SUMMARY
+        echo "- Workers: 20 (cloud-hosted)" >> $GITHUB_STEP_SUMMARY
+        echo "- Browsers: Chromium, Firefox, WebKit, Mobile Chrome, Mobile Safari" >> $GITHUB_STEP_SUMMARY
+        echo "- Timeout: 60 minutes" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Available Artifacts:" >> $GITHUB_STEP_SUMMARY
+        echo "- 📊 azure-playwright-report: Detailed HTML test report" >> $GITHUB_STEP_SUMMARY
+        echo "- 📸 azure-playwright-screenshots: Screenshots of any failures" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ job.status }}" = "success" ]; then
+          echo "### ✅ Result: All tests passed successfully on Azure!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ❌ Result: Some tests failed - check artifacts for details" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🚀 Azure Playwright Workspaces Benefits:" >> $GITHUB_STEP_SUMMARY
+        echo "- ⚡ 20 parallel workers in the cloud" >> $GITHUB_STEP_SUMMARY
+        echo "- 🌐 Cross-browser testing (5 browser configurations)" >> $GITHUB_STEP_SUMMARY
+        echo "- 📈 Scalable execution environment" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔍 Rich diagnostics and reporting" >> $GITHUB_STEP_SUMMARY

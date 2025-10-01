@@ -111,6 +111,27 @@ npx playwright test --config=playwright-chromium.config.js
 npx playwright test --config=playwright-simple.config.js
 ```
 
+### ☁️ Azure Playwright Workspaces
+Este projeto também suporta execução de testes com **Azure Playwright Workspaces** para testes em escala na nuvem:
+
+```bash
+# Executar testes no Azure Playwright Workspaces
+npx playwright test --config=playwright.service.config.ts --workers=20
+```
+
+**Benefícios do Azure Playwright Workspaces:**
+- ⚡ **20 workers paralelos** na nuvem
+- 🌐 **Multi-browser completo** (Chromium, Firefox, WebKit, Mobile)
+- 📊 **Relatórios integrados** no Azure Portal
+- 🚀 **Infraestrutura escalável** e gerenciada
+- 💰 **Execução otimizada** com controle de custos
+
+**Workflows Automatizados:**
+- `azure-playwright-tests.yml` - Testes rápidos em Push/PR
+- `azure-multi-browser-tests.yml` - Testes completos agendados
+
+📚 **Configuração completa:** [docs/AZURE-PLAYWRIGHT-SETUP.md](docs/AZURE-PLAYWRIGHT-SETUP.md)
+
 ## Interface Web
 
 A interface web oferece:

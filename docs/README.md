@@ -13,6 +13,7 @@ Bem-vindo à documentação completa do projeto Todo List App! Este diretório c
 - **[CI-WORKERS-FIX.md](CI-WORKERS-FIX.md)** - Correção da configuração de workers
 
 ### 🧪 Testing & Quality
+- **[AZURE-PLAYWRIGHT-SETUP.md](AZURE-PLAYWRIGHT-SETUP.md)** - Configuração completa do Azure Playwright Workspaces
 - **[PLAYWRIGHT-CONFIGS.md](PLAYWRIGHT-CONFIGS.md)** - Estratégias de configuração dos testes Playwright
 - **[MULTI-BROWSER-FIXES.md](MULTI-BROWSER-FIXES.md)** - Correções para compatibilidade multi-browser
 - **[PERFORMANCE-OPTIMIZATION.md](PERFORMANCE-OPTIMIZATION.md)** - Otimizações de performance dos testes
@@ -52,6 +53,7 @@ Bem-vindo à documentação completa do projeto Todo List App! Este diretório c
 | Documento | Status | Última Atualização | Versão |
 |-----------|--------|--------------------|--------|
 | PROJECT-SUMMARY.md | ✅ Atualizado | 2025-09-30 | v1.0 |
+| AZURE-PLAYWRIGHT-SETUP.md | ✅ Atualizado | 2025-09-30 | v1.0 |
 | CI-CD-PIPELINES.md | ✅ Atualizado | 2025-09-30 | v2.0 |
 | GITHUB-ACTIONS-OPTIMIZATION.md | ✅ Atualizado | 2025-09-30 | v1.0 |
 | PLAYWRIGHT-CONFIGS.md | ✅ Atualizado | 2025-09-30 | v1.0 |
