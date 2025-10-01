@@ -10,6 +10,7 @@ Bem-vindo à documentação completa do projeto Todo List App! Este diretório c
 ### 🚀 CI/CD & Deployment
 - **[CI-CD-PIPELINES.md](CI-CD-PIPELINES.md)** - Estratégia completa de pipelines
 - **[GITHUB-ACTIONS-OPTIMIZATION.md](GITHUB-ACTIONS-OPTIMIZATION.md)** - Otimizações implementadas no GitHub Actions
+- **[AZURE-LOGIN-OPTIMIZATION.md](AZURE-LOGIN-OPTIMIZATION.md)** - Otimização do login Azure (64% mais rápido)
 - **[CI-WORKERS-FIX.md](CI-WORKERS-FIX.md)** - Correção da configuração de workers
 
 ### 🧪 Testing & Quality

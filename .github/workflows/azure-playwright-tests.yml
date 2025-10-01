@@ -32,7 +32,10 @@ jobs:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        enable-AzPSSession: true
+        # Otimização: Só Azure CLI, sem PowerShell para Playwright
+        enable-AzPSSession: false
+        # Otimização: Permitir comandos paralelos
+        allow-no-subscriptions: false
 
     - name: 🔧 Setup .NET
       uses: actions/setup-dotnet@v3
