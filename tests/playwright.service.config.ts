@@ -6,7 +6,8 @@ dotenv.config();
 // Detectar se deve usar Azure Workspaces
 const serviceUrl = process.env.PLAYWRIGHT_SERVICE_URL;
 const isCI = process.env.CI === 'true';
-const useAzureWorkspaces = !!(serviceUrl && serviceUrl.trim() && isCI);
+const hasAzureCredentials = !!(process.env.AZURE_ACCESS_TOKEN || process.env.AZURE_CLIENT_ID);
+const useAzureWorkspaces = !!(serviceUrl && serviceUrl.trim() && (isCI || hasAzureCredentials));
 
 // Log da configuração
 console.log('🎭 Playwright Configuration:');
@@ -15,8 +16,12 @@ if (useAzureWorkspaces) {
   console.log(`   Service URL: ${serviceUrl}`);
   console.log(`   Workers: ${process.env.PLAYWRIGHT_WORKERS || '20'}`);
   console.log(`   Repository: ${process.env.GITHUB_REPOSITORY || 'unknown'}`);
+  console.log(`   Authentication: ${process.env.AZURE_ACCESS_TOKEN ? 'Token' : process.env.AZURE_CLIENT_ID ? 'Service Principal' : 'Default'}`);
 } else {
-  console.log(`   Reason: ${!isCI ? 'Not in CI environment' : 'Service URL not configured'}`);
+  const reason = !serviceUrl ? 'Service URL not configured' : 
+                !isCI && !hasAzureCredentials ? 'Not in CI environment and no Azure credentials' : 
+                'Unknown reason';
+  console.log(`   Reason: ${reason}`);
   console.log(`   Workers: 4 (local)`);
 }
 if (useAzureWorkspaces) {
