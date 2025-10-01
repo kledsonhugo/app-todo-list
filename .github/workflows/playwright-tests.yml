@@ -1,8 +1,8 @@
-name: Testes Playwright - E2E Tests
+name: Playwright - E2E Tests
 
 on:
   push:
-    branches: [ test ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 

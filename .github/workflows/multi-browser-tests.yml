@@ -1,4 +1,4 @@
-name: Testes Playwright - Multi-Browser E2E Tests
+name: Playwright - Multi-Browser E2E Tests
 
 on:
   schedule:
