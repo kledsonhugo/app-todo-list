@@ -9,16 +9,10 @@
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
-    "test:azure": "playwright test --config=playwright.service.config.ts",
-    "test:azure:ui": "playwright test --config=playwright.service.config.ts --ui",
-    "test:azure:headed": "playwright test --config=playwright.service.config.ts --headed",
-    "test:local": "playwright test --config=playwright.config.js",
-    "report": "playwright show-report",
-    "report:azure": "playwright show-report playwright-report-azure"
+    "report": "playwright show-report"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0",
-    "@azure/playwright": "latest",
     "dotenv": "^16.3.1"
   },
   "keywords": [
