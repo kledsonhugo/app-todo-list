@@ -16,6 +16,7 @@ Bem-vindo à documentação completa do projeto Todo List App! Este diretório c
 - **[AZURE-PLAYWRIGHT-SETUP.md](AZURE-PLAYWRIGHT-SETUP.md)** - Configuração completa do Azure Playwright Workspaces
 - **[AZURE-CREDENTIALS-SETUP.md](AZURE-CREDENTIALS-SETUP.md)** - Guia completo para configurar credenciais Azure
 - **[AZURE-OIDC-TROUBLESHOOTING.md](AZURE-OIDC-TROUBLESHOOTING.md)** - Correção do erro AADSTS70025 (credenciais federadas)
+- **[WEBSERVER-PORT-CONFLICT-FIX.md](WEBSERVER-PORT-CONFLICT-FIX.md)** - Correção do conflito de porta no webServer
 - **[PLAYWRIGHT-CONFIGS.md](PLAYWRIGHT-CONFIGS.md)** - Estratégias de configuração dos testes Playwright
 - **[MULTI-BROWSER-FIXES.md](MULTI-BROWSER-FIXES.md)** - Correções para compatibilidade multi-browser
 - **[PERFORMANCE-OPTIMIZATION.md](PERFORMANCE-OPTIMIZATION.md)** - Otimizações de performance dos testes

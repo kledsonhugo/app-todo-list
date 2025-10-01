@@ -35,7 +35,7 @@ export default defineConfig({
   webServer: {
     command: 'dotnet run --project ../TodoListApp.csproj',
     url: 'http://localhost:5146',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true, // Always reuse existing server (CI starts it separately)
     timeout: 120 * 1000, // 2 minutos para iniciar
     env: {
       ASPNETCORE_ENVIRONMENT: 'Development',
