@@ -25,7 +25,7 @@ Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas
 ├── tests/                # Test Suite
 │   ├── e2e/                # Testes End-to-End
 │   │   ├── api.spec.js       # Testes da API (8 cenários)
-│   │   └── todo-app.spec.js  # Testes da interface (8 cenários)
+│   │   └── todo-app.spec.js  # Testes da interface (15 cenários - 100% cobertura)
 │   ├── playwright.chromium.config.js  # Config otimizada CI
 │   ├── playwright-simple.config.js    # Config local multi-browser
 │   ├── package.json        # Dependências e scripts de teste
@@ -221,18 +221,28 @@ Este projeto possui uma estratégia robusta de CI/CD com 3 pipelines especializa
 ## 🧪 Testes Automatizados
 
 ### 📋 Cobertura de Testes
-- **Testes E2E** cobrindo toda a aplicação (8 API + 8 UI)
+- **Testes E2E** cobrindo toda a aplicação (8 API + 15 UI)
 - **API Tests** - Todos os endpoints REST com validação completa
+- **UI Tests** - 100% de cobertura da interface web
 
-### 🎯 Cenários Testados
+### 🎯 Cenários Testados - Interface Web
 - ✅ Carregamento da página principal
 - ✅ Exibição de tarefas padrão
 - ✅ Criação de novas tarefas
 - ✅ Marcação como concluída
 - ✅ Filtros por status
-- ✅ Edição de tarefas (modal)
+- ✅ Abertura do modal de edição
+- ✅ Edição completa de tarefas (salvar alterações)
+- ✅ Fechamento do modal com botão Cancelar
+- ✅ Fechamento do modal ao clicar fora
 - ✅ Exclusão de tarefas
 - ✅ Atualização da lista
+- ✅ Notificações toast (sucesso/erro)
+- ✅ Mensagem de lista vazia
+- ✅ Validação de formulário (título obrigatório)
+- ✅ Validação de edição (título obrigatório)
+
+### 🎯 Cenários Testados - API
 - ✅ Validação de API (CRUD completo)
 - ✅ Tratamento de erros
 
