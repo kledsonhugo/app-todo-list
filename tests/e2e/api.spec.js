@@ -101,19 +101,36 @@ test.describe('Todo List API Tests', () => {
   });
 
   test('deve alternar status de completado via API', async ({ request }) => {
-    // Primeiro, listar todos os TODOs para obter um ID
-    const listResponse = await request.get(`${baseURL}/api/todos`);
-    const todos = await listResponse.json();
-    const todo = todos[0];
-    const originalStatus = todo.isCompleted;
+    // Primeiro, criar um TODO com status conhecido
+    const newTodo = {
+      title: 'TODO para Toggle Test',
+      description: 'Este TODO será usado para testar toggle'
+    };
+
+    const createResponse = await request.post(`${baseURL}/api/todos`, {
+      data: newTodo
+    });
+    expect(createResponse.status()).toBe(201);
+    const createdTodo = await createResponse.json();
+    const originalStatus = createdTodo.isCompleted; // Deve ser false inicialmente
 
     // Alternar o status
-    const response = await request.patch(`${baseURL}/api/todos/${todo.id}/toggle`);
+    const response = await request.patch(`${baseURL}/api/todos/${createdTodo.id}/toggle`);
     
     expect(response.status()).toBe(200);
     
     const updatedTodo = await response.json();
     expect(updatedTodo.isCompleted).toBe(!originalStatus);
+    
+    // Verificar se alternou corretamente (false -> true)
+    expect(updatedTodo.isCompleted).toBe(true);
+
+    // Alternar novamente para confirmar que funciona nos dois sentidos
+    const secondToggleResponse = await request.patch(`${baseURL}/api/todos/${createdTodo.id}/toggle`);
+    expect(secondToggleResponse.status()).toBe(200);
+    
+    const secondUpdatedTodo = await secondToggleResponse.json();
+    expect(secondUpdatedTodo.isCompleted).toBe(false);
   });
 
   test('deve deletar um TODO via API', async ({ request }) => {

@@ -320,37 +320,44 @@ test.describe('Todo List Application', () => {
 
   // Teste simplificado de exclusão de uma única tarefa
   test('deve excluir uma tarefa específica', async ({ page }) => {
-    // Aguardar que as tarefas carreguem
-    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    // Primeiro, criar uma tarefa específica para este teste
+    const uniqueTitle = `Tarefa para Exclusão ${Date.now()}`;
     
-    // Aguardar que a página esteja completamente carregada
-    await page.waitForLoadState('networkidle');
+    // Preencher o formulário para criar uma nova tarefa
+    await page.fill('#todoTitle', uniqueTitle);
+    await page.fill('#todoDescription', 'Esta tarefa será excluída no teste');
+    await page.click('button[type="submit"]');
     
-    // Contar tarefas antes
-    const todoItemsBefore = page.locator('.todo-item');
-    const countBefore = await todoItemsBefore.count();
+    // Aguardar que a nova tarefa apareça na lista
+    await page.waitForSelector(`text="${uniqueTitle}"`, { timeout: 10000 });
     
-    if (countBefore > 0) {
-      // Localizar o botão de excluir da primeira tarefa
-      const deleteButton = page.locator('.todo-item .delete-btn').first();
-      
-      // Aguardar que o botão esteja visível e estável
-      await deleteButton.waitFor({ state: 'visible' });
-      await deleteButton.scrollIntoViewIfNeeded();
-      
-      // Configurar handler para aceitar o diálogo
-      page.on('dialog', dialog => dialog.accept());
-      
-      // Usar force click para evitar intercepts
-      await deleteButton.click({ force: true });
-      
-      // Aguardar que a tarefa seja removida
-      await page.waitForTimeout(2000);
-      
-      // Verificar se o número de tarefas diminuiu
-      const todoItemsAfter = page.locator('.todo-item');
-      const countAfter = await todoItemsAfter.count();
-      expect(countAfter).toBe(countBefore - 1);
-    }
+    // Localizar a tarefa recém-criada pelo seu título único
+    const todoItem = page.locator('.todo-item').filter({ hasText: uniqueTitle });
+    await expect(todoItem).toBeVisible();
+    
+    // Localizar o botão de exclusão desta tarefa específica
+    const deleteButton = todoItem.locator('.delete-btn');
+    
+    // Aguardar que o botão esteja visível
+    await deleteButton.waitFor({ state: 'visible' });
+    
+    // Configurar handler para aceitar o diálogo de confirmação
+    page.on('dialog', dialog => dialog.accept());
+    
+    // Clicar no botão de exclusão
+    await deleteButton.click({ force: true });
+    
+    // Aguardar que a tarefa específica desapareça do DOM
+    await page.waitForSelector(`text="${uniqueTitle}"`, { 
+      state: 'detached', 
+      timeout: 10000 
+    });
+    
+    // Verificar que a tarefa não está mais visível
+    await expect(todoItem).not.toBeVisible();
+    
+    // Verificação adicional: garantir que não há mais elementos com esse texto
+    const remainingItems = page.locator('.todo-item').filter({ hasText: uniqueTitle });
+    await expect(remainingItems).toHaveCount(0);
   });
 });
