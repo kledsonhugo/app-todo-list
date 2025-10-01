@@ -105,8 +105,57 @@ jobs:
 
     - name: ⏳ Wait for application to be ready
       run: |
-        timeout 90 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 3; done'
-        echo "✅ Application is ready for ${{ matrix.browser }}!"
+        echo "🔍 Checking application startup..."
+        
+        # Aguardar processo iniciar
+        sleep 2
+        
+        # Health check otimizado com retry exponencial
+        for attempt in {1..20}; do
+          echo "Attempt $attempt: Checking health..."
+          
+          # Primeiro verificar se a porta está aberta (mais rápido)
+          if nc -z localhost 5146 2>/dev/null; then
+            echo "✅ Port 5146 is open"
+            
+            # Então verificar se a API responde
+            if curl -f -s --max-time 5 http://localhost:5146/api/todos > /dev/null; then
+              echo "✅ API is responding"
+              
+              # Verificação final: garantir que retorna JSON válido
+              if curl -f -s --max-time 5 http://localhost:5146/api/todos | jq . > /dev/null 2>&1; then
+                echo "✅ Application is ready and healthy for ${{ matrix.browser }}!"
+                break
+              else
+                echo "⚠️  API responding but not returning valid JSON yet..."
+              fi
+            else
+              echo "⚠️  Port open but API not ready yet..."
+            fi
+          else
+            echo "⚠️  Port 5146 not ready yet..."
+          fi
+          
+          # Retry com backoff exponencial
+          if [ $attempt -lt 20 ]; then
+            delay=$((attempt <= 5 ? 1 : attempt <= 10 ? 2 : 3))
+            echo "💤 Waiting ${delay}s before retry..."
+            sleep $delay
+          fi
+        done
+        
+        # Verificação final
+        if ! curl -f -s --max-time 10 http://localhost:5146/api/todos > /dev/null; then
+          echo "❌ Application failed to start properly"
+          echo "🔍 Checking application logs..."
+          # Tentar mostrar logs do processo se possível
+          if [ ! -z "$APP_PID" ] && kill -0 "$APP_PID" 2>/dev/null; then
+            echo "📊 Application process is running (PID: $APP_PID)"
+          else
+            echo "❌ Application process is not running"
+          fi
+          exit 1
+        fi
 
     - name: 🧪 Run Playwright tests on ${{ matrix.browser }} with Azure Workspaces
       working-directory: tests

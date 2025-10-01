@@ -56,8 +56,33 @@ jobs:
 
     - name: ⏳ Wait for application to be ready
       run: |
-        timeout 90 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 3; done'
-        echo "✅ Application is ready!"
+        echo "🔍 Checking application startup..."
+        
+        # Aguardar processo iniciar
+        sleep 2
+        
+        # Health check otimizado
+        for attempt in {1..15}; do
+          echo "Attempt $attempt: Checking health..."
+          
+          if nc -z localhost 5146 2>/dev/null; then
+            if curl -f -s --max-time 5 http://localhost:5146/api/todos > /dev/null; then
+              echo "✅ Application is ready and healthy!"
+              break
+            fi
+          fi
+          
+          if [ $attempt -lt 15 ]; then
+            delay=$((attempt <= 5 ? 1 : 2))
+            sleep $delay
+          fi
+        done
+        
+        # Verificação final
+        if ! curl -f -s --max-time 10 http://localhost:5146/api/todos > /dev/null; then
+          echo "❌ Application failed to start properly"
+          exit 1
+        fi
 
     - name: 🧪 Run Playwright tests
       working-directory: tests
