@@ -1,4 +1,4 @@
-name: Playwright - Production Release
+name: Playwright - Production
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: 🔧 Setup .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
@@ -122,7 +122,7 @@ jobs:
       run: kill $APP_PID || true
 
   e2e-tests:
-    name: E2E Tests (Production Mode)
+    name: E2E Tests
     runs-on: ubuntu-latest
     needs: api-tests
     steps:
@@ -151,7 +151,7 @@ jobs:
       working-directory: tests
       run: npx playwright install --with-deps chromium
 
-    - name: Start application (Production)
+    - name: Start application
       run: |
         dotnet run --project TodoListApp.csproj --configuration Release &
         echo "APP_PID=$!" >> $GITHUB_ENV
@@ -162,23 +162,24 @@ jobs:
     - name: Health check
       run: timeout 60 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 2; done'
 
-    - name: Run E2E tests
+    - name: Run Playwright tests
       working-directory: tests
       run: npx playwright test --config=playwright.chromium.config.js --reporter=html
       env:
         CI: true
         PLAYWRIGHT_WORKERS: 4
+        PLAYWRIGHT_HTML_REPORT: playwright-production
 
     - name: Stop application
       if: always()
       run: kill $APP_PID || true
 
-    - name: Upload test report
+    - name: Upload Playwright report
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: production-e2e-report
-        path: tests/playwright-report/
+        name: playwright-production
+        path: tests/playwright-production/
         retention-days: 30
 
   security-scan:
@@ -192,7 +193,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: 🔧 Setup .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}

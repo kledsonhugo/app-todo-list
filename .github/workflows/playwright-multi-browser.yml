@@ -1,4 +1,4 @@
-name: Playwright - Multi-Browser E2E Tests
+name: Playwright - Multi-Browser
 
 on:
   workflow_dispatch:
@@ -12,7 +12,6 @@ on:
         - 'chromium'
         - 'firefox'
         - 'webkit'
-        - 'chromium,firefox'
         - 'chromium,firefox,webkit'
 
 env:
@@ -50,12 +49,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: 🔧 Setup .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: 🔧 Setup Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
@@ -78,28 +77,16 @@ jobs:
 
     - name: Run Playwright tests on ${{ matrix.browser }}
       working-directory: tests
-      run: |
-        # Use optimized config with maximum parallelization for CI
-        # Playwright gerencia o servidor automaticamente via webServer config
-        npx playwright test --project=${{ matrix.browser }} --config=playwright.multi.config.js --reporter=html
+      run: npx playwright test --project=${{ matrix.browser }} --config=playwright.multi.config.js --reporter=html
       env:
         CI: true
-        PLAYWRIGHT_HTML_REPORT: playwright-report-${{ matrix.browser }}
-        # Force full parallelization
         PLAYWRIGHT_WORKERS: 4
+        PLAYWRIGHT_HTML_REPORT: playwright-multi-${{ matrix.browser }}
 
     - name:  Upload test results for ${{ matrix.browser }}
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: playwright-report-${{ matrix.browser }}
-        path: tests/playwright-report-${{ matrix.browser }}/
-        retention-days: 30
-
-    - name: Upload screenshots for ${{ matrix.browser }}
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: playwright-screenshots-${{ matrix.browser }}
-        path: tests/test-results/
+        name: playwright-multi-${{ matrix.browser }}
+        path: tests/playwright-multi-${{ matrix.browser }}/
         retention-days: 30
