@@ -2,9 +2,9 @@ name: Playwright - Single Browser
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ develop, test ]
   pull_request:
-    branches: [ test ]
+    branches: [ develop ]
 
 env:
   DOTNET_VERSION: '8.0.x'
