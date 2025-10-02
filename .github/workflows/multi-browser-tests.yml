@@ -1,9 +1,6 @@
 name: Playwright - Multi-Browser E2E Tests
 
 on:
-  schedule:
-    # Executa todos os dias às 2:00 AM UTC
-    - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
       browsers:
@@ -20,7 +17,7 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
 
 jobs:
   test-strategy:

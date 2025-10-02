@@ -1,23 +1,10 @@
-name: Azure Playwright - E2E Tests
+name: Azure Playwright - Single Browser
 
 on:
-  workflow_dispatch:
-    inputs:
-      test_config:
-        description: 'Azure Playwright Configuration'
-        required: true
-        default: 'chromium'
-        type: choice
-        options:
-        - 'chromium'
-        - 'multi-browser'
-      workers:
-        description: 'Number of workers (Azure can handle more)'
-        required: false
-        default: '10'
-        type: string
-  schedule:
-    - cron: '0 3 * * *'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 env:
   DOTNET_VERSION: '8.0.x'
@@ -105,14 +92,13 @@ jobs:
           exit 1
         fi
 
-    - name: Run Azure Playwright tests (Chromium)
-      if: ${{ github.event.inputs.test_config == 'chromium' || github.event_name == 'schedule' }}
+    - name: Run Azure Playwright tests
       working-directory: tests
       run: npx playwright test --config=playwright.azure.chromium.config.ts --reporter=html
       env:
         CI: true
-        PLAYWRIGHT_WORKERS: ${{ github.event.inputs.workers || '10' }}
-        PLAYWRIGHT_HTML_REPORT: azure-playwright-report-chromium
+        PLAYWRIGHT_WORKERS: 4
+        PLAYWRIGHT_HTML_REPORT: azure-single-browser
 
     - name: Stop application
       if: always()
@@ -121,12 +107,11 @@ jobs:
           kill $APP_PID || true
         fi
 
-    - name: Upload Azure Playwright report (Chromium)
+    - name: Upload Azure Playwright report
       uses: actions/upload-artifact@v4
-      if: always() && (github.event.inputs.test_config == 'chromium' || github.event_name == 'schedule')
       with:
-        name: azure-playwright-report-chromium
-        path: tests/azure-playwright-report-chromium/
+        name: azure-single-browser
+        path: tests/playwright-report/
         retention-days: 30
 
     - name: Upload screenshots
