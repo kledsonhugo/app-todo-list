@@ -1,0 +1,92 @@
+name: Playwright - Multi-Browser
+
+on:
+  workflow_dispatch:
+    inputs:
+      browsers:
+        description: 'Browsers to test'
+        required: true
+        default: 'chromium,firefox,webkit'
+        type: choice
+        options:
+        - 'chromium'
+        - 'firefox'
+        - 'webkit'
+        - 'chromium,firefox,webkit'
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '20'
+
+jobs:
+  test-strategy:
+    name: Playwright Test Strategy
+    runs-on: ubuntu-latest
+    outputs:
+      browsers: ${{ steps.browsers.outputs.list }}
+    steps:
+    - name: Set browser list
+      id: browsers
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          BROWSERS="${{ github.event.inputs.browsers }}"
+        else
+          BROWSERS="chromium,firefox,webkit"
+        fi
+        echo "list=[\"$(echo $BROWSERS | sed 's/,/\",\"/g')\"]" >> $GITHUB_OUTPUT
+
+  multi-browser-tests:
+    name: Test on ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    needs: test-strategy
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: ${{ fromJson(needs.test-strategy.outputs.browsers) }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: 'tests/package.json'
+
+    - name: Restore .NET dependencies
+      run: dotnet restore app-todo-list.sln
+
+    - name: Build .NET application
+      run: dotnet build app-todo-list.sln --no-restore
+
+    - name: Install Node.js dependencies
+      working-directory: tests
+      run: npm install
+
+    - name: Install Playwright browsers
+      working-directory: tests
+      run: npx playwright install --with-deps ${{ matrix.browser }}
+
+    - name: Run Playwright tests on ${{ matrix.browser }}
+      working-directory: tests
+      run: npx playwright test --project=${{ matrix.browser }} --config=playwright.multi.config.js --reporter=html
+      env:
+        CI: true
+        PLAYWRIGHT_WORKERS: 4
+        PLAYWRIGHT_HTML_REPORT: playwright-multi-${{ matrix.browser }}
+
+    - name:  Upload test results for ${{ matrix.browser }}
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-multi-${{ matrix.browser }}
+        path: tests/playwright-multi-${{ matrix.browser }}/
+        retention-days: 30

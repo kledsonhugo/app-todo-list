@@ -1,0 +1,108 @@
+name: Playwright - Single Browser
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ test ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  NODE_VERSION: '20'
+
+jobs:
+  playwright-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: 'tests/package.json'
+
+    - name: Restore .NET dependencies
+      run: dotnet restore app-todo-list.sln
+
+    - name: Build .NET application
+      run: dotnet build app-todo-list.sln --no-restore
+
+    - name: Install Node.js dependencies
+      working-directory: tests
+      run: npm install
+
+    - name: Install Playwright browsers
+      working-directory: tests
+      run: npx playwright install --with-deps chromium
+
+    - name: Start application in background
+      run: |
+        dotnet run --project TodoListApp.csproj &
+        echo "APP_PID=$!" >> $GITHUB_ENV
+      env:
+        ASPNETCORE_ENVIRONMENT: Development
+        ASPNETCORE_URLS: http://localhost:5146
+
+    - name: Wait for application to be ready
+      run: |
+        echo "Checking application startup..."
+        
+        # Aguardar processo iniciar
+        sleep 2
+        
+        # Health check otimizado
+        for attempt in {1..15}; do
+          echo "Attempt $attempt: Checking health..."
+          
+          if nc -z localhost 5146 2>/dev/null; then
+            if curl -f -s --max-time 5 http://localhost:5146/api/todos > /dev/null; then
+              echo "Application is ready and healthy!"
+              break
+            fi
+          fi
+          
+          if [ $attempt -lt 15 ]; then
+            delay=$((attempt <= 5 ? 1 : 2))
+            sleep $delay
+          fi
+        done
+        
+        # Verificação final
+        if ! curl -f -s --max-time 10 http://localhost:5146/api/todos > /dev/null; then
+          echo "Application failed to start properly"
+          exit 1
+        fi
+
+    - name: Run Playwright tests
+      working-directory: tests
+      run: npx playwright test --config=playwright.chromium.config.js --reporter=html
+      env:
+        CI: true
+        PLAYWRIGHT_WORKERS: 4
+        PLAYWRIGHT_HTML_REPORT: playwright-single-browser
+
+    - name: Stop application
+      if: always()
+      run: |
+        if [ ! -z "$APP_PID" ]; then
+          kill $APP_PID || true
+        fi
+
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-single-browser
+        path: tests/playwright-single-browser/
+        retention-days: 30

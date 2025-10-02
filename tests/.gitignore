@@ -1,0 +1,16 @@
+# Node.js dependencies
+node_modules/
+
+# Package lock files (using npm install instead of npm ci)
+package-lock.json
+yarn.lock
+
+# Playwright results
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Test artifacts
+*.png
+*.webm
+*.mp4

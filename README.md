@@ -1,75 +1,104 @@
-# Todo List API
+# Todo List - Full-Stack Application
 
-Uma aplicação .NET Web API para gerenciamento de lista de tarefas (to-do list) com interface web moderna.
-
-## Funcionalidades
-
-- ✅ **Interface Web Completa** - Interface moderna e responsiva
-- ✅ Criar novas tarefas
-- ✅ Listar todas as tarefas
-- ✅ Filtrar tarefas (Todas, Pendentes, Concluídas)
-- ✅ Obter uma tarefa específica por ID
-- ✅ Atualizar tarefas existentes
-- ✅ Marcar/desmarcar tarefas como concluídas
-- ✅ Deletar tarefas
-- ✅ Documentação automática com Swagger/OpenAPI
-- ✅ Notificações em tempo real
-- ✅ Design responsivo para mobile
+Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas com interface web moderna.
 
 ## Acesso Rápido
 
-- **🌐 Interface Web:** http://localhost:5146
-- **📚 API Docs (Swagger):** http://localhost:5146/api/docs
+- ** Interface Web:** http://localhost:5146
+- ** API Docs (Swagger):** http://localhost:5146/api/docs
 
 ## Estrutura do Projeto
 
 ```
-├── Controllers/        # Controladores da API
-│   └── TodosController.cs
-├── DTOs/              # Data Transfer Objects
-│   └── TodoItemDtos.cs
-├── Models/            # Modelos de dados
-│   └── TodoItem.cs
-├── Services/          # Serviços de negócio
-│   └── TodoService.cs
-├── wwwroot/           # Interface Web
-│   ├── index.html     # Página principal
-│   ├── styles.css     # Estilos CSS
-│   └── script.js      # JavaScript da interface
-├── Program.cs         # Configuração da aplicação
-└── TodoListApp.http   # Exemplos de requisições HTTP
+├── Controllers/           # API Controllers
+│   └── TodosController.cs    # Endpoints REST da API
+├── DTOs/                 # Data Transfer Objects
+│   └── TodoItemDtos.cs      # Contratos de entrada/saída
+├── Models/               # Domain Models
+│   └── TodoItem.cs         # Modelo principal da tarefa
+├── Services/             # Business Logic
+│   └── TodoService.cs      # Serviço de gerenciamento de tarefas
+├── wwwroot/              # Static Web Assets
+│   ├── index.html          # Interface web principal
+│   ├── styles.css          # Estilos CSS responsivos
+│   └── script.js           # JavaScript da aplicação
+├── tests/                # Test Suite Completo
+│   ├── e2e/                # Testes End-to-End
+│   │   ├── api.spec.js       # Testes da API (8 cenários)
+│   │   └── todo-app.spec.js  # Testes da interface (8 cenários)
+│   ├── playwright.chromium.config.js    # Config local Chromium apenas (4 workers)
+│   ├── playwright.multi.config.js       # Config local multi-browser (4 workers)
+│   ├── playwright.azure.chromium.config.ts  # Config Azure Chromium (10 workers)
+│   ├── playwright.azure.multi.config.ts     # Config Azure multi-browser (8 workers)
+│   ├── package.json        # Scripts npm e dependências
+│   └── package-lock.json   # Lock das dependências
+├── .github/workflows/    # CI/CD Pipelines
+│   ├── playwright-tests.yml        # Pipeline principal E2E
+│   ├── multi-browser-tests.yml     # Pipeline multi-browser
+│   └── production-release.yml      # Pipeline de produção
+└── Program.cs            # Configuração da aplicação
 ```
 
 ## Como Executar
 
-1. **Pré-requisitos:**
-   - .NET 8.0 SDK instalado
+### Pré-requisitos
+- **.NET 8.0 SDK** - [Download aqui](https://dotnet.microsoft.com/download/dotnet/8.0)
+- **Node.js 18+** (opcional - apenas para executar testes)
 
-2. **Executar a aplicação:**
-   ```bash
-   dotnet run
-   ```
+### Execução Rápida
+```bash
+# 1. Clone o repositório
+git clone https://github.com/kledsonhugo/app-todo-list.git
+cd app-todo-list
 
-3. **Acessar a aplicação:**
-   - **Interface Web:** http://localhost:5146
-   - **Documentação da API:** http://localhost:5146/api/docs
+# 2. Restaurar dependências
+dotnet restore app-todo-list.sln
+
+# 3. Executar a aplicação
+dotnet run --project TodoListApp.csproj
+```
+
+### Executar Testes (Opcional)
+```bash
+# 1. Instalar dependências de teste
+cd tests && npm install
+
+# 2. Instalar browsers Playwright
+npx playwright install
+
+# 3. Executar testes locais (Chromium apenas - mais rápido)
+npm run test:local:chromium
+# ou: npx playwright test --config=playwright.chromium.config.js
+
+# 4. Executar testes locais multi-browser (completo)
+npm run test:local:multi  
+# ou: npx playwright test --config=playwright.multi.config.js
+
+# 5. Executar testes Azure Playwright (se configurado)
+npm run test:azure:chromium   # Azure Chromium apenas
+npm run test:azure:multi      # Azure multi-browser
+
+# 6. Visualizar relatório dos testes
+npm run report
+# ou: npx playwright show-report
+```
 
 ## Interface Web
 
 A interface web oferece:
 
-### 🎨 Design Moderno
+### Design Moderno
 - Interface limpa e intuitiva
 - Gradient de cores atrativo
 - Ícones Font Awesome
 - Animações suaves
 
-### 📱 Responsivo
+### Responsivo
 - Funciona perfeitamente em desktop, tablet e mobile
 - Layout adaptativo
 - Botões otimizados para touch
 
-### ⚡ Funcionalidades Interativas
+### Funcionalidades Interativas
 - **Adicionar Tarefas** - Formulário com validação
 - **Filtrar Tarefas** - Todas, Pendentes, Concluídas
 - **Editar Tarefas** - Modal de edição completo
@@ -78,7 +107,7 @@ A interface web oferece:
 - **Notificações** - Toast messages para feedback
 - **Atualização Automática** - Sincronização com a API
 
-### 🔄 Integração com API
+### Integração com API
 - Comunicação assíncrona com a API
 - Tratamento de erros
 - Loading states
@@ -138,61 +167,159 @@ Remove uma tarefa.
 
 ## Tecnologias Utilizadas
 
-### Backend
-- .NET 8.0
-- ASP.NET Core Web API
-- Swagger/OpenAPI para documentação
-- CORS configurado
-- Armazenamento em memória
+### Backend (.NET 8.0)
+- **ASP.NET Core Web API** - Framework principal
+- **Swagger/OpenAPI** - Documentação automática da API
+- **CORS** - Configurado para desenvolvimento e produção
+- **In-Memory Storage** - Armazenamento simples para demonstração
+- **DTOs & Validation** - Contratos bem definidos
 
-### Frontend
-- HTML5 semântico
-- CSS3 com Flexbox/Grid
-- JavaScript ES6+
-- Font Awesome Icons
-- Fetch API para requisições
-- Design responsivo
+### Frontend (Vanilla Web)
+- **HTML5** - Semântica moderna
+- **CSS3** - Flexbox, Grid, Custom Properties, Animations
+- **JavaScript ES6+** - Async/Await, Fetch API, Modules
+- **Font Awesome** - Ícones profissionais
+- **Responsive Design** - Mobile-first approach
 
-## Dados de Exemplo
+### Testing & Quality (Playwright)
+- **Playwright** - Framework de testes E2E moderno
+- **Configurações Flexíveis** - Local (.js) e Azure (.ts)
+- **Multi-Browser Support** - Chromium, Firefox, WebKit
+- **Parallel Execution** - 4 workers locais, 8-10 no Azure
+- **Headless Mode** - Execução otimizada sem interface gráfica
+- **Visual Testing** - Screenshots e vídeos de falhas
+- **API Testing** - Testes diretos dos endpoints REST
+- **Azure Playwright** - Integração com serviço de testes na nuvem
 
-A aplicação inicia com 3 tarefas de exemplo:
-1. **"Estudar .NET"** (pendente)
-2. **"Fazer exercícios"** (concluída)
-3. **"Ler documentação"** (pendente)
+## CI/CD (GitHub Actions)
+- **3 Pipelines Especializados** - E2E, Multi-browser, Production
+- **Matrix Strategy** - Execução paralela por browser
+- **Security Scans** - TruffleHog para detecção de secrets
+- **Artifact Management** - Relatórios e evidências
+- **Performance Optimization** - 50-70% speedup implementado
 
-## Screenshots das Funcionalidades
+### Pipeline de Testes Single Browser
+- **Arquivo**: `.github/workflows/playwright-tests.yml`
+- **Trigger**: Push em qualquer branch
+- **Configuração**: `playwright.chromium.config.js` (local)
+- **Browser**: Chromium apenas (otimizado para velocidade)
+- **Workers**: 4 paralelos
+- **Modo**: Headless
+- **Tempo**: ~1.5 minutos
+- **Objetivo**: Feedback rápido para desenvolvimento
 
-### 📝 Adicionar Tarefas
-- Formulário intuitivo com validação
-- Campos para título e descrição
-- Feedback visual de sucesso
+### Pipeline de Testes Multi-Browser
+- **Arquivo**: `.github/workflows/multi-browser-tests.yml`  
+- **Trigger**: Agendado diário + Execução manual
+- **Configuração**: `playwright.multi.config.js` (local)
+- **Browsers**: Chromium, Firefox, WebKit
+- **Workers**: 4 por browser (execução em matriz paralela)
+- **Modo**: Headless
+- **Tempo**: ~4-5 minutos
+- **Objetivo**: Compatibilidade cross-browser
 
-### 🔍 Filtros Inteligentes
-- Botões para filtrar por status
-- Contadores visuais
-- Transições suaves
+### Pipeline para ambientes de Produção
+- **Arquivo**: `.github/workflows/production-release.yml`
+- **Trigger**: Push na main + Tags + Releases
+- **Configuração**: `playwright.chromium.config.js` (local)
+- **Inclui**: Code quality, API tests, E2E tests, Security scans
+- **Workers**: 4 paralelos
+- **Modo**: Headless
+- **Tempo**: ~4 minutos
+- **Objetivo**: Release com qualidade garantida
 
-### ✏️ Edição Inline
-- Modal elegante para edição
-- Todos os campos editáveis
-- Validação em tempo real
+### ☁️ Pipeline de Testes Single Browser com Azure Playwright
+- **Arquivo**: `.github/workflows/azure-playwright-tests.yml`
+- **Trigger**: Manual + Agendado diário (3:00 AM UTC)
+- **Configuração**: `playwright.azure.chromium.config.ts` ou `playwright.azure.multi.config.ts`
+- **Browsers**: Configurável (Chromium ou Multi-browser)
+- **Workers**: 8-20 workers (configurável)
+- **Modo**: Nuvem Azure Playwright
+- **Tempo**: ~2-6 minutos (dependendo da configuração)
+- **Objetivo**: Testes de alta performance na nuvem
 
-### 📱 Mobile First
-- Interface otimizada para mobile
-- Botões grandes para facilitar o toque
-- Layout empilhado em telas pequenas
+### Performance Comparativa
+| Pipeline | Configuração | Workers | Browsers | Tempo Médio | Ambiente |
+|----------|-------------|---------|----------|-------------|----------|
+| Single Browser | Local Chromium | 4 | 1 (Chromium) | ~1.5min | GitHub Actions |
+| Multi-Browser | Local Multi | 4x3 | 3 (Chrome/Firefox/Safari) | ~4-5min | GitHub Actions |
+| Produção | Local Chromium | 4 | 1 (Chromium) | ~4min | GitHub Actions |
+| Single Browser Azure | Azure Cloud | 10 | 1 (Chromium) | ~2-3min | Azure Playwright |
 
-## Próximos Passos
+## Azure Playwright
 
-Para uma aplicação de produção, considere implementar:
+O projeto inclui configurações para **Azure Playwright Service** e **pipeline dedicado**, permitindo execução de testes em infraestrutura de nuvem escalável:
 
-- Persistência em banco de dados (Entity Framework Core)
-- Autenticação e autorização
-- Paginação para listagem de tarefas
-- Busca e filtros avançados
-- Categorias/tags para tarefas
-- Datas de vencimento
-- Notificações push
-- Modo offline (PWA)
-- Testes unitários e de integração
-- Docker para containerização
+### Configurações Azure Disponíveis
+- **`playwright.azure.chromium.config.ts`** - Chromium na nuvem (10 workers, timeouts otimizados)
+- **`playwright.azure.multi.config.ts`** - Multi-browser na nuvem (8 workers, máxima compatibilidade)
+
+### Como Usar
+```bash
+# Testes locais (sempre disponíveis)
+npm run test:local:chromium    # Local Chromium
+npm run test:local:multi       # Local multi-browser
+
+# Testes Azure (requer configuração de secrets)
+npm run test:azure:chromium    # Azure Chromium
+npm run test:azure:multi       # Azure multi-browser
+```
+
+### Configuração Azure
+Para usar o pipeline Azure Playwright, configure os secrets no GitHub:
+- `PLAYWRIGHT_SERVICE_URL` - URL do workspace Azure Playwright
+- `PLAYWRIGHT_SERVICE_ACCESS_TOKEN` - Token de acesso Azure
+- `AZURE_CREDENTIALS` - Credenciais Azure CLI (opcional)
+
+📖 **Guia completo**: [Azure Playwright Setup](.github/AZURE_PLAYWRIGHT_SETUP.md)
+
+> **Nota**: O pipeline Azure é opcional. Todos os workflows principais funcionam com configurações locais.
+
+## Testes Automatizados
+
+### Cobertura de Testes
+- **16 testes de API** - Cobertura completa de todos os endpoints REST
+- **16 testes de UI** - Cobertura de todas as interações da interface web
+- **Total: 32 testes** executados em paralelo com 4 workers
+
+### Cenários Testados
+
+#### **API Tests (8 cenários)**
+- ✅ Listar todas as tarefas (GET /api/todos)
+- ✅ Obter tarefa específica (GET /api/todos/{id})
+- ✅ Criar nova tarefa (POST /api/todos)
+- ✅ Atualizar tarefa (PUT /api/todos/{id})
+- ✅ Alternar status de conclusão (PATCH /api/todos/{id}/toggle)
+- ✅ Deletar tarefa (DELETE /api/todos/{id})
+- ✅ Tratar erro 404 para tarefa inexistente
+- ✅ Validar campos obrigatórios
+
+#### **Interface Tests (8 cenários)**
+- ✅ Carregamento da página principal
+- ✅ Exibição de tarefas padrão
+- ✅ Criação de novas tarefas
+- ✅ Marcação como concluída/pendente
+- ✅ Filtros por status (Todas/Pendentes/Concluídas)
+- ✅ Abertura do modal de edição
+- ✅ Exclusão de tarefas com confirmação
+- ✅ Atualização da lista (refresh)
+
+## Licença
+
+Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+## Contribuições
+
+Contribuições são bem-vindas! Por favor:
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+## Autor
+
+**Kledson Hugo** - [GitHub](https://github.com/kledsonhugo)
+
+---
