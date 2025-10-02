@@ -55,7 +55,7 @@ const chromiumConfig = defineConfig({
   webServer: {
     command: 'dotnet run --project ../TodoListApp.csproj',
     url: 'http://localhost:5146',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true, // Always reuse for Azure Pipeline
     timeout: 120 * 1000, // 2 minutes timeout
   },
 });
