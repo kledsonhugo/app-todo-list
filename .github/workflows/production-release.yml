@@ -16,10 +16,10 @@ env:
 
 jobs:
   validate-code:
-    name: 🔍 Code Quality & Security
+    name: Code Quality & Security
     runs-on: ubuntu-latest
     steps:
-    - name: 📥 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
 
     - name: 🔧 Setup .NET
@@ -27,37 +27,37 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: 📦 Restore dependencies
+    - name: Restore dependencies
       run: dotnet restore app-todo-list.sln
 
-    - name: 🏗️ Build application
+    - name: Build application
       run: dotnet build app-todo-list.sln --no-restore --configuration Release
 
-    - name: 🎨 Check code formatting
+    - name: Check code formatting
       run: dotnet format app-todo-list.sln --verify-no-changes --verbosity diagnostic
 
   api-tests:
-    name: 🧪 API Integration Tests
+    name: API Integration Tests
     runs-on: ubuntu-latest
     needs: validate-code
     services:
       http-client:
         image: curlimages/curl:latest
     steps:
-    - name: 📥 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: 🔧 Setup .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: 📦 Restore & Build
+    - name: Restore & Build
       run: |
         dotnet restore app-todo-list.sln
         dotnet build app-todo-list.sln --no-restore --configuration Release
 
-    - name: 🚀 Start application
+    - name: Start application
       run: |
         dotnet run --project TodoListApp.csproj --configuration Release &
         echo "APP_PID=$!" >> $GITHUB_ENV
@@ -65,93 +65,93 @@ jobs:
         ASPNETCORE_ENVIRONMENT: Production
         ASPNETCORE_URLS: http://localhost:5146
 
-    - name: ⏳ Wait for startup
+    - name: Wait for startup
       run: timeout 60 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 2; done'
 
-    - name: 🧪 Run API tests with curl
+    - name: Run API tests with curl
       run: |
         set -e
-        echo "🔍 Testing API endpoints..."
+        echo "Testing API endpoints..."
         
         # Test GET all todos
-        echo "📋 Testing GET /api/todos"
+        echo "Testing GET /api/todos"
         RESPONSE=$(curl -s -w "%{http_code}" http://localhost:5146/api/todos)
         HTTP_CODE=${RESPONSE: -3}
         if [ "$HTTP_CODE" != "200" ]; then
-          echo "❌ GET /api/todos failed with code $HTTP_CODE"
+          echo "GET /api/todos failed with code $HTTP_CODE"
           exit 1
         fi
-        echo "✅ GET /api/todos - OK"
+        echo "GET /api/todos - OK"
         
         # Test GET specific todo
-        echo "📋 Testing GET /api/todos/1"
+        echo "Testing GET /api/todos/1"
         RESPONSE=$(curl -s -w "%{http_code}" http://localhost:5146/api/todos/1)
         HTTP_CODE=${RESPONSE: -3}
         if [ "$HTTP_CODE" != "200" ]; then
-          echo "❌ GET /api/todos/1 failed with code $HTTP_CODE"
+          echo "GET /api/todos/1 failed with code $HTTP_CODE"
           exit 1
         fi
-        echo "✅ GET /api/todos/1 - OK"
+        echo "GET /api/todos/1 - OK"
         
         # Test POST new todo
-        echo "📋 Testing POST /api/todos"
+        echo "Testing POST /api/todos"
         RESPONSE=$(curl -s -w "%{http_code}" -X POST http://localhost:5146/api/todos \
           -H "Content-Type: application/json" \
           -d '{"title": "CI Test Todo", "description": "Created by CI pipeline"}')
         HTTP_CODE=${RESPONSE: -3}
         if [ "$HTTP_CODE" != "201" ]; then
-          echo "❌ POST /api/todos failed with code $HTTP_CODE"
+          echo "POST /api/todos failed with code $HTTP_CODE"
           exit 1
         fi
-        echo "✅ POST /api/todos - OK"
+        echo "POST /api/todos - OK"
         
         # Test PATCH toggle
-        echo "📋 Testing PATCH /api/todos/1/toggle"
+        echo "Testing PATCH /api/todos/1/toggle"
         RESPONSE=$(curl -s -w "%{http_code}" -X PATCH http://localhost:5146/api/todos/1/toggle)
         HTTP_CODE=${RESPONSE: -3}
         if [ "$HTTP_CODE" != "200" ]; then
-          echo "❌ PATCH /api/todos/1/toggle failed with code $HTTP_CODE"
+          echo "PATCH /api/todos/1/toggle failed with code $HTTP_CODE"
           exit 1
         fi
-        echo "✅ PATCH /api/todos/1/toggle - OK"
+        echo "PATCH /api/todos/1/toggle - OK"
         
-        echo "🎉 All API tests passed!"
+        echo "All API tests passed!"
 
-    - name: 🛑 Stop application
+    - name: Stop application
       if: always()
       run: kill $APP_PID || true
 
   e2e-tests:
-    name: 🎭 E2E Tests (Production Mode)
+    name: E2E Tests (Production Mode)
     runs-on: ubuntu-latest
     needs: api-tests
     steps:
-    - name: 📥 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: 🔧 Setup .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: 🔧 Setup Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
         cache-dependency-path: 'tests/package.json'
 
-    - name: 📦 Install dependencies
+    - name: Install dependencies
       run: |
         dotnet restore app-todo-list.sln
         dotnet build app-todo-list.sln --no-restore --configuration Release
         cd tests && npm install
 
-    - name: 🎭 Install Playwright
+    - name: Install Playwright
       working-directory: tests
       run: npx playwright install --with-deps chromium
 
-    - name: 🚀 Start application (Production)
+    - name: Start application (Production)
       run: |
         dotnet run --project TodoListApp.csproj --configuration Release &
         echo "APP_PID=$!" >> $GITHUB_ENV
@@ -159,21 +159,21 @@ jobs:
         ASPNETCORE_ENVIRONMENT: Production
         ASPNETCORE_URLS: http://localhost:5146
 
-    - name: ⏳ Health check
+    - name: Health check
       run: timeout 60 bash -c 'until curl -f http://localhost:5146/api/todos; do sleep 2; done'
 
-    - name: 🧪 Run E2E tests
+    - name: Run E2E tests
       working-directory: tests
       run: npx playwright test --config=playwright.chromium.config.js --reporter=html
       env:
         CI: true
         PLAYWRIGHT_WORKERS: 4
 
-    - name: 🛑 Stop application
+    - name: Stop application
       if: always()
       run: kill $APP_PID || true
 
-    - name: 📊 Upload test report
+    - name: Upload test report
       uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -182,12 +182,12 @@ jobs:
         retention-days: 30
 
   security-scan:
-    name: 🔒 Security Analysis
+    name: Security Analysis
     runs-on: ubuntu-latest
     needs: validate-code
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-    - name: 📥 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
@@ -197,12 +197,12 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: 🔒 Run security audit
+    - name: Run security audit
       run: |
         dotnet restore app-todo-list.sln
         dotnet list package --vulnerable --include-transitive || true
 
-    - name: 🔍 Scan for secrets
+    - name: Scan for secrets
       uses: trufflesecurity/trufflehog@main
       with:
         path: ./
@@ -210,29 +210,29 @@ jobs:
       continue-on-error: true
 
   build-artifacts:
-    name: 📦 Build Release Artifacts
+    name: Build Release Artifacts
     runs-on: ubuntu-latest
     needs: [api-tests, e2e-tests]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-    - name: 📥 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: 🔧 Setup .NET
+    - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: 📦 Restore dependencies
+    - name: Restore dependencies
       run: dotnet restore app-todo-list.sln
 
-    - name: 🏗️ Build for Release
+    - name: Build for Release
       run: dotnet build app-todo-list.sln --configuration Release --no-restore
 
-    - name: 📦 Publish application
+    - name: Publish application
       run: dotnet publish TodoListApp.csproj --configuration Release --output ./publish --no-build
 
-    - name: 📤 Upload build artifacts
+    - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: todo-app-release-${{ github.sha }}
@@ -240,27 +240,27 @@ jobs:
         retention-days: 90
 
   deployment-ready:
-    name: ✅ Deployment Ready
+    name: Deployment Ready
     runs-on: ubuntu-latest
     needs: [security-scan, build-artifacts]
     if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-    - name: 📋 Deployment Summary
+    - name: Deployment Summary
       run: |
-        echo "## 🚀 Production Release Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## Production Release Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### ✅ Completed Stages:" >> $GITHUB_STEP_SUMMARY
+        echo "### Completed Stages:" >> $GITHUB_STEP_SUMMARY
         echo "- Code Quality & Formatting" >> $GITHUB_STEP_SUMMARY
         echo "- API Integration Tests" >> $GITHUB_STEP_SUMMARY  
         echo "- E2E Production Tests (Chromium optimized)" >> $GITHUB_STEP_SUMMARY
         echo "- Security Analysis" >> $GITHUB_STEP_SUMMARY
         echo "- Release Artifacts" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📦 Artifacts:" >> $GITHUB_STEP_SUMMARY
+        echo "### Artifacts:" >> $GITHUB_STEP_SUMMARY
         echo "- `todo-app-release-${{ github.sha }}` - Ready for deployment" >> $GITHUB_STEP_SUMMARY
         echo "- `production-e2e-report` - Test results" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 🎯 Next Steps:" >> $GITHUB_STEP_SUMMARY
+        echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
         echo "1. Download release artifacts" >> $GITHUB_STEP_SUMMARY
         echo "2. Deploy to production environment" >> $GITHUB_STEP_SUMMARY
         echo "3. Run post-deployment smoke tests" >> $GITHUB_STEP_SUMMARY

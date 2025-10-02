@@ -1,13 +1,13 @@
-# 🚀 Todo List API - Full-Stack Application
+# Todo List - Full-Stack Application
 
 Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas com interface web moderna.
 
 ## Acesso Rápido
 
-- **🌐 Interface Web:** http://localhost:5146
-- **📚 API Docs (Swagger):** http://localhost:5146/api/docs
+- ** Interface Web:** http://localhost:5146
+- ** API Docs (Swagger):** http://localhost:5146/api/docs
 
-## 🏗️ Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 ├── Controllers/           # API Controllers
@@ -39,13 +39,13 @@ Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas
 └── Program.cs            # Configuração da aplicação
 ```
 
-## 🚀 Como Executar
+## Como Executar
 
-### 📋 Pré-requisitos
+### Pré-requisitos
 - **.NET 8.0 SDK** - [Download aqui](https://dotnet.microsoft.com/download/dotnet/8.0)
 - **Node.js 18+** (opcional - apenas para executar testes)
 
-### ⚡ Execução Rápida
+### Execução Rápida
 ```bash
 # 1. Clone o repositório
 git clone https://github.com/kledsonhugo/app-todo-list.git
@@ -58,7 +58,7 @@ dotnet restore app-todo-list.sln
 dotnet run --project TodoListApp.csproj
 ```
 
-### 🧪 Executar Testes (Opcional)
+### Executar Testes (Opcional)
 ```bash
 # 1. Instalar dependências de teste
 cd tests && npm install
@@ -87,18 +87,18 @@ npm run report
 
 A interface web oferece:
 
-### 🎨 Design Moderno
+### Design Moderno
 - Interface limpa e intuitiva
 - Gradient de cores atrativo
 - Ícones Font Awesome
 - Animações suaves
 
-### 📱 Responsivo
+### Responsivo
 - Funciona perfeitamente em desktop, tablet e mobile
 - Layout adaptativo
 - Botões otimizados para touch
 
-### ⚡ Funcionalidades Interativas
+### Funcionalidades Interativas
 - **Adicionar Tarefas** - Formulário com validação
 - **Filtrar Tarefas** - Todas, Pendentes, Concluídas
 - **Editar Tarefas** - Modal de edição completo
@@ -107,7 +107,7 @@ A interface web oferece:
 - **Notificações** - Toast messages para feedback
 - **Atualização Automática** - Sincronização com a API
 
-### 🔄 Integração com API
+### Integração com API
 - Comunicação assíncrona com a API
 - Tratamento de erros
 - Loading states
@@ -165,23 +165,23 @@ Remove uma tarefa.
 }
 ```
 
-## 🔧 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
-### 🖥️ Backend (.NET 8.0)
+### Backend (.NET 8.0)
 - **ASP.NET Core Web API** - Framework principal
 - **Swagger/OpenAPI** - Documentação automática da API
 - **CORS** - Configurado para desenvolvimento e produção
 - **In-Memory Storage** - Armazenamento simples para demonstração
 - **DTOs & Validation** - Contratos bem definidos
 
-### 🎨 Frontend (Vanilla Web)
+### Frontend (Vanilla Web)
 - **HTML5** - Semântica moderna
 - **CSS3** - Flexbox, Grid, Custom Properties, Animations
 - **JavaScript ES6+** - Async/Await, Fetch API, Modules
 - **Font Awesome** - Ícones profissionais
 - **Responsive Design** - Mobile-first approach
 
-### 🧪 Testing & Quality (Playwright)
+### Testing & Quality (Playwright)
 - **Playwright** - Framework de testes E2E moderno
 - **Configurações Flexíveis** - Local (.js) e Azure (.ts)
 - **Multi-Browser Support** - Chromium, Firefox, WebKit
@@ -191,18 +191,14 @@ Remove uma tarefa.
 - **API Testing** - Testes diretos dos endpoints REST
 - **Azure Playwright** - Integração com serviço de testes na nuvem
 
-### 🚀 CI/CD (GitHub Actions)
+## CI/CD (GitHub Actions)
 - **3 Pipelines Especializados** - E2E, Multi-browser, Production
 - **Matrix Strategy** - Execução paralela por browser
 - **Security Scans** - TruffleHog para detecção de secrets
 - **Artifact Management** - Relatórios e evidências
 - **Performance Optimization** - 50-70% speedup implementado
 
-## 🔄 CI/CD Pipelines
-
-Este projeto possui uma estratégia robusta de CI/CD com 3 pipelines especializados, todos utilizando as configurações locais (.js) para máxima compatibilidade:
-
-### 🧪 Pipeline Principal (E2E Tests)
+### Pipeline de Testes Single Browser
 - **Arquivo**: `.github/workflows/playwright-tests.yml`
 - **Trigger**: Push em qualquer branch
 - **Configuração**: `playwright.chromium.config.js` (local)
@@ -212,7 +208,7 @@ Este projeto possui uma estratégia robusta de CI/CD com 3 pipelines especializa
 - **Tempo**: ~1.5 minutos
 - **Objetivo**: Feedback rápido para desenvolvimento
 
-### 🌐 Pipeline Multi-Browser
+### Pipeline de Testes Multi-Browser
 - **Arquivo**: `.github/workflows/multi-browser-tests.yml`  
 - **Trigger**: Agendado diário + Execução manual
 - **Configuração**: `playwright.multi.config.js` (local)
@@ -222,7 +218,7 @@ Este projeto possui uma estratégia robusta de CI/CD com 3 pipelines especializa
 - **Tempo**: ~4-5 minutos
 - **Objetivo**: Compatibilidade cross-browser
 
-### 🚀 Pipeline de Produção
+### Pipeline para ambientes de Produção
 - **Arquivo**: `.github/workflows/production-release.yml`
 - **Trigger**: Push na main + Tags + Releases
 - **Configuração**: `playwright.chromium.config.js` (local)
@@ -232,80 +228,63 @@ Este projeto possui uma estratégia robusta de CI/CD com 3 pipelines especializa
 - **Tempo**: ~4 minutos
 - **Objetivo**: Release com qualidade garantida
 
-### 📊 Performance
-| Pipeline | Configuração | Workers | Browsers | Tempo Médio |
-|----------|-------------|---------|----------|-------------|
-| E2E Principal | Local Chromium | 4 | 1 (Chromium) | ~1.5min ⚡ |
-| Multi-Browser | Local Multi | 4x3 | 3 (Chrome/Firefox/Safari) | ~4-5min 🚀 |
-| Produção | Local Chromium | 4 | 1 (Chromium) | ~4min ✅ |
+### ☁️ Pipeline de Testes Single Browser com Azure Playwright
+- **Arquivo**: `.github/workflows/azure-playwright-tests.yml`
+- **Trigger**: Manual + Agendado diário (3:00 AM UTC)
+- **Configuração**: `playwright.azure.chromium.config.ts` ou `playwright.azure.multi.config.ts`
+- **Browsers**: Configurável (Chromium ou Multi-browser)
+- **Workers**: 8-20 workers (configurável)
+- **Modo**: Nuvem Azure Playwright
+- **Tempo**: ~2-6 minutos (dependendo da configuração)
+- **Objetivo**: Testes de alta performance na nuvem
 
-### 🎯 Características dos Pipelines
-- **Sem dependências Azure** - Todos usam configurações locais (.js)
-- **Modo headless** - Performance máxima em ambiente CI
-- **Paralelização otimizada** - 4 workers para balanceamento ideal
-- **Artifacts automáticos** - Relatórios HTML e screenshots de falhas
-- **Matrix strategy** - Execução paralela por browser no multi-browser
+### Performance Comparativa
+| Pipeline | Configuração | Workers | Browsers | Tempo Médio | Ambiente |
+|----------|-------------|---------|----------|-------------|----------|
+| Single Browser | Local Chromium | 4 | 1 (Chromium) | ~1.5min | GitHub Actions |
+| Multi-Browser | Local Multi | 4x3 | 3 (Chrome/Firefox/Safari) | ~4-5min | GitHub Actions |
+| Produção | Local Chromium | 4 | 1 (Chromium) | ~4min | GitHub Actions |
+| Single Browser Azure | Azure Cloud | 10 | 1 (Chromium) | ~2-3min | Azure Playwright |
 
-## ☁️ Azure Playwright Integration
+## Azure Playwright
 
-O projeto inclui configurações opcionais para **Azure Playwright Service**, permitindo execução de testes em infraestrutura de nuvem escalável:
+O projeto inclui configurações para **Azure Playwright Service** e **pipeline dedicado**, permitindo execução de testes em infraestrutura de nuvem escalável:
 
-### 🔧 Configurações Azure Disponíveis
+### Configurações Azure Disponíveis
 - **`playwright.azure.chromium.config.ts`** - Chromium na nuvem (10 workers, timeouts otimizados)
 - **`playwright.azure.multi.config.ts`** - Multi-browser na nuvem (8 workers, máxima compatibilidade)
 
-### 🚀 Vantagens do Azure Playwright
-- **Paralelização massiva** - Até 20 workers simultâneos
-- **Infraestrutura gerenciada** - Sem necessidade de manter browsers locais
-- **Logs centralizados** - Monitoramento e debugging avançados
-- **Escalabilidade automática** - Recursos ajustados conforme demanda
-
-### 📋 Como Usar (Opcional)
+### Como Usar
 ```bash
-# Executar no Azure Playwright (requer configuração de workspace)
-npm run test:azure:chromium    # Chromium na nuvem
-npm run test:azure:multi       # Multi-browser na nuvem
+# Testes locais (sempre disponíveis)
+npm run test:local:chromium    # Local Chromium
+npm run test:local:multi       # Local multi-browser
+
+# Testes Azure (requer configuração de secrets)
+npm run test:azure:chromium    # Azure Chromium
+npm run test:azure:multi       # Azure multi-browser
 ```
 
-> **Nota**: As configurações Azure são opcionais. Os workflows de CI/CD usam apenas configurações locais para máxima compatibilidade.
+### Configuração Azure
+Para usar o pipeline Azure Playwright, configure os secrets no GitHub:
+- `PLAYWRIGHT_SERVICE_URL` - URL do workspace Azure Playwright
+- `PLAYWRIGHT_SERVICE_ACCESS_TOKEN` - Token de acesso Azure
+- `AZURE_CREDENTIALS` - Credenciais Azure CLI (opcional)
 
-## 🧪 Testes Automatizados
+📖 **Guia completo**: [Azure Playwright Setup](.github/AZURE_PLAYWRIGHT_SETUP.md)
 
-### � Arquitetura de Testes
-O projeto implementa uma estratégia de testes híbrida com configurações específicas para diferentes ambientes:
+> **Nota**: O pipeline Azure é opcional. Todos os workflows principais funcionam com configurações locais.
 
-#### **🏠 Configurações Locais (JavaScript)**
-- **`playwright.chromium.config.js`** - Chromium apenas, 4 workers, headless
-- **`playwright.multi.config.js`** - Multi-browser (Chrome/Firefox/Safari), 4 workers, headless
+## Testes Automatizados
 
-#### **☁️ Configurações Azure (TypeScript)**  
-- **`playwright.azure.chromium.config.ts`** - Azure Chromium, 10 workers, timeouts otimizados
-- **`playwright.azure.multi.config.ts`** - Azure multi-browser, 8 workers, máxima compatibilidade
-
-### 📋 Scripts de Teste Disponíveis
-```bash
-# Testes locais (desenvolvimento)
-npm run test:local:chromium    # Chromium apenas (mais rápido)
-npm run test:local:multi       # Multi-browser (validação completa)
-
-# Testes Azure Playwright (CI/CD)
-npm run test:azure:chromium    # Azure Chromium (CI otimizado)
-npm run test:azure:multi       # Azure multi-browser (validação final)
-
-# Utilitários
-npm run test:ui               # Modo interface gráfica
-npm run test:debug           # Modo debug para desenvolvimento
-npm run report              # Visualizar relatórios HTML
-```
-
-### 🎯 Cobertura de Testes
+### Cobertura de Testes
 - **16 testes de API** - Cobertura completa de todos os endpoints REST
 - **16 testes de UI** - Cobertura de todas as interações da interface web
 - **Total: 32 testes** executados em paralelo com 4 workers
 
-### ✅ Cenários Testados
+### Cenários Testados
 
-#### **📡 API Tests (8 cenários)**
+#### **API Tests (8 cenários)**
 - ✅ Listar todas as tarefas (GET /api/todos)
 - ✅ Obter tarefa específica (GET /api/todos/{id})
 - ✅ Criar nova tarefa (POST /api/todos)
@@ -315,7 +294,7 @@ npm run report              # Visualizar relatórios HTML
 - ✅ Tratar erro 404 para tarefa inexistente
 - ✅ Validar campos obrigatórios
 
-#### **🖥️ Interface Tests (8 cenários)**
+#### **Interface Tests (8 cenários)**
 - ✅ Carregamento da página principal
 - ✅ Exibição de tarefas padrão
 - ✅ Criação de novas tarefas
@@ -325,18 +304,11 @@ npm run report              # Visualizar relatórios HTML
 - ✅ Exclusão de tarefas com confirmação
 - ✅ Atualização da lista (refresh)
 
-#### **⚙️ Configurações de Performance**
-- **Workers locais**: 4 (balanceamento ideal)
-- **Workers Azure**: 8-10 (máxima paralelização)
-- **Timeouts**: Otimizados por ambiente (45s local, 90-120s Azure)
-- **Retries**: Configurados por contexto (1-3 tentativas)
-- **Modo headless**: Ativo para performance máxima
-
-## 📜 Licença
+## Licença
 
 Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## 🤝 Contribuições
+## Contribuições
 
 Contribuições são bem-vindas! Por favor:
 
@@ -346,10 +318,8 @@ Contribuições são bem-vindas! Por favor:
 4. Push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
 
-## 👨‍💻 Autor
+## Autor
 
 **Kledson Hugo** - [GitHub](https://github.com/kledsonhugo)
 
 ---
-
-⭐ **Se este projeto foi útil, deixe uma estrela!** ⭐

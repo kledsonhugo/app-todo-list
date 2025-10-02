@@ -1,20 +1,35 @@
-name: Playwright - E2E Tests
+name: Azure Playwright - E2E Tests
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      test_config:
+        description: 'Azure Playwright Configuration'
+        required: true
+        default: 'chromium'
+        type: choice
+        options:
+        - 'chromium'
+        - 'multi-browser'
+      workers:
+        description: 'Number of workers (Azure can handle more)'
+        required: false
+        default: '10'
+        type: string
+  schedule:
+    - cron: '0 3 * * *'
 
 env:
   DOTNET_VERSION: '8.0.x'
   NODE_VERSION: '18'
+  PLAYWRIGHT_SERVICE_URL: ${{ secrets.PLAYWRIGHT_SERVICE_URL }}
+  PLAYWRIGHT_SERVICE_ACCESS_TOKEN: ${{ secrets.PLAYWRIGHT_SERVICE_ACCESS_TOKEN }}
 
 jobs:
-  playwright-tests:
-    name: E2E Tests
+  azure-playwright-tests:
+    name: Azure E2E Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     
     steps:
     - name: Checkout code
@@ -42,54 +57,57 @@ jobs:
       working-directory: tests
       run: npm install
 
-    - name: Install Playwright browsers
-      working-directory: tests
-      run: npx playwright install --with-deps chromium
+    - name: Authenticate with Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Start application in background
       run: |
         dotnet run --project TodoListApp.csproj &
         echo "APP_PID=$!" >> $GITHUB_ENV
       env:
-        ASPNETCORE_ENVIRONMENT: Development
+        ASPNETCORE_ENVIRONMENT: Production
         ASPNETCORE_URLS: http://localhost:5146
 
     - name: Wait for application to be ready
       run: |
-        echo "Checking application startup..."
+        echo "Checking application startup for Azure Playwright..."
         
         # Aguardar processo iniciar
-        sleep 2
+        sleep 3
         
-        # Health check otimizado
-        for attempt in {1..15}; do
+        # Health check com timeout maior para Azure
+        for attempt in {1..20}; do
           echo "Attempt $attempt: Checking health..."
           
           if nc -z localhost 5146 2>/dev/null; then
             if curl -f -s --max-time 5 http://localhost:5146/api/todos > /dev/null; then
-              echo "Application is ready and healthy!"
+              echo "Application is ready for Azure Playwright!"
               break
             fi
           fi
           
-          if [ $attempt -lt 15 ]; then
+          if [ $attempt -lt 20 ]; then
             delay=$((attempt <= 5 ? 1 : 2))
             sleep $delay
           fi
         done
         
         # Verificação final
-        if ! curl -f -s --max-time 10 http://localhost:5146/api/todos > /dev/null; then
+        if ! curl -f -s --max-time 15 http://localhost:5146/api/todos > /dev/null; then
           echo "Application failed to start properly"
           exit 1
         fi
 
-    - name: Run Playwright tests
+    - name: Run Azure Playwright tests (Chromium)
+      if: ${{ github.event.inputs.test_config == 'chromium' || github.event_name == 'schedule' }}
       working-directory: tests
-      run: npx playwright test --config=playwright.chromium.config.js --reporter=html
+      run: npx playwright test --config=playwright.azure.chromium.config.ts --reporter=html
       env:
         CI: true
-        PLAYWRIGHT_WORKERS: 4
+        PLAYWRIGHT_WORKERS: ${{ github.event.inputs.workers || '10' }}
+        PLAYWRIGHT_HTML_REPORT: azure-playwright-report-chromium
 
     - name: Stop application
       if: always()
@@ -98,18 +116,18 @@ jobs:
           kill $APP_PID || true
         fi
 
-    - name: Upload Playwright report
+    - name: Upload Azure Playwright report (Chromium)
       uses: actions/upload-artifact@v4
-      if: always()
+      if: always() && (github.event.inputs.test_config == 'chromium' || github.event_name == 'schedule')
       with:
-        name: playwright-report
-        path: tests/playwright-report/
+        name: azure-playwright-report-chromium
+        path: tests/azure-playwright-report-chromium/
         retention-days: 30
 
     - name: Upload screenshots
       uses: actions/upload-artifact@v4
       if: failure()
       with:
-        name: playwright-screenshots
+        name: azure-playwright-screenshots
         path: tests/test-results/
         retention-days: 30
