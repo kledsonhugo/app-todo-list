@@ -192,41 +192,33 @@ Remove uma tarefa.
 - **Azure Playwright** - Integração com serviço de testes na nuvem
 
 ## CI/CD (GitHub Actions)
-- **3 Pipelines Especializados** - E2E, Multi-browser, Production
-- **Matrix Strategy** - Execução paralela por browser
-- **Security Scans** - TruffleHog para detecção de secrets
-- **Artifact Management** - Relatórios e evidências
-- **Performance Optimization** - 50-70% speedup implementado
 
-### Pipeline de Testes Single Browser
-- **Arquivo**: `.github/workflows/playwright-tests.yml`
-- **Trigger**: Push em qualquer branch
-- **Configuração**: `playwright.chromium.config.js` (local)
-- **Browser**: Chromium apenas (otimizado para velocidade)
-- **Workers**: 4 paralelos
-- **Modo**: Headless
-- **Tempo**: ~1.5 minutos
-- **Objetivo**: Feedback rápido para desenvolvimento
+### Pipelines Locais
+- **`playwright-single-browser.yml`** - Pipeline principal E2E (Chromium)
+- **`playwright-multi-browser.yml`** - Pipeline multi-browser (Chromium, Firefox, WebKit)
+- **`playwright-production.yml`** - Pipeline de produção
 
-### Pipeline de Testes Multi-Browser
-- **Arquivo**: `.github/workflows/multi-browser-tests.yml`  
-- **Trigger**: Agendado diário + Execução manual
-- **Configuração**: `playwright.multi.config.js` (local)
-- **Browsers**: Chromium, Firefox, WebKit
-- **Workers**: 4 por browser (execução em matriz paralela)
-- **Modo**: Headless
-- **Tempo**: ~4-5 minutos
-- **Objetivo**: Compatibilidade cross-browser
+### Pipelines Azure ☁️
+- **`azure-playwright-single-browser.yml`** - Azure Playwright single-browser (Chromium otimizado)
+- **`azure-playwright-multi-browser.yml`** - Azure multi-browser com matrix strategy
 
-### Pipeline para ambientes de Produção
-- **Arquivo**: `.github/workflows/production-release.yml`
-- **Trigger**: Push na main + Tags + Releases
-- **Configuração**: `playwright.chromium.config.js` (local)
-- **Inclui**: Code quality, API tests, E2E tests, Security scans
-- **Workers**: 4 paralelos
-- **Modo**: Headless
-- **Tempo**: ~4 minutos
-- **Objetivo**: Release com qualidade garantida
+#### Características dos Pipelines Azure:
+- **Performance Superior**: 8-10 workers vs 4 workers locais
+- **Infraestrutura Dedicada**: Azure cloud com browsers pré-instalados
+- **Autenticação OIDC**: Integração segura com GitHub Actions
+- **Execução Flexível**: Manual (workflow_dispatch) e agendada (semanal)
+- **Artefatos Separados**: Relatórios individualizados por browser
+
+### Comparativo de Performance
+
+| Pipeline | Workers | Browsers | Duração Estimada | Uso |
+|----------|---------|----------|------------------|-----|
+| **Local Chromium** | 4 | Chromium | ~3-5 min | ✅ Validação rápida |
+| **Local Multi-browser** | 4 | Chrome/Firefox/WebKit | ~8-12 min | ✅ Compatibilidade |
+| **Azure Chromium** | 10 | Chromium | ~2-3 min | ⚡ Performance |
+| **Azure Multi-browser** | 8 | Chrome/Firefox/WebKit | ~5-8 min | 🚀 Cobertura + Speed |
+
+## Azure Playwright Integration 🚀
 
 ### ☁️ Pipeline de Testes Single Browser com Azure Playwright
 - **Arquivo**: `.github/workflows/azure-playwright-tests.yml`
@@ -271,9 +263,10 @@ Para usar o pipeline Azure Playwright, configure os secrets no GitHub:
 - `PLAYWRIGHT_SERVICE_ACCESS_TOKEN` - Token de acesso Azure
 - `AZURE_CREDENTIALS` - Credenciais Azure CLI (opcional)
 
-📖 **Guia completo**: [Azure Playwright Setup](.github/AZURE_PLAYWRIGHT_SETUP.md)
+📖 **Guia completo**: [Azure Playwright Setup](.github/AZURE_PLAYWRIGHT_SETUP.md)  
+📖 **Pipeline Multi-Browser**: [Azure Multi-Browser Pipeline](AZURE_MULTI_BROWSER_PIPELINE.md)
 
-> **Nota**: O pipeline Azure é opcional. Todos os workflows principais funcionam com configurações locais.
+> **Nota**: Os pipelines Azure são opcionais. Todos os workflows principais funcionam com configurações locais.
 
 ## Testes Automatizados
 
