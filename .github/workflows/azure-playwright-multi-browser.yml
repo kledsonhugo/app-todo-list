@@ -18,6 +18,8 @@ on:
         required: false
         default: '4'
         type: string
+  schedule:
+    - cron: '0 6 * * 1'
 
 env:
   DOTNET_VERSION: '8.0.x'
