@@ -2,9 +2,9 @@ name: Azure Playwright - Single Browser
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ test ]
 
 env:
   DOTNET_VERSION: '8.0.x'
