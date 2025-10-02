@@ -1,25 +1,29 @@
 name: Azure Playwright - Multi-Browser
 
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       browsers:
+#         description: 'Browsers to test on Azure'
+#         required: true
+#         default: 'chromium,firefox,webkit'
+#         type: choice
+#         options:
+#         - 'chromium'
+#         - 'firefox'
+#         - 'webkit'
+#         - 'chromium,firefox,webkit'
+#       workers:
+#         description: 'Number of workers'
+#         required: false
+#         default: '4'
+#         type: string
+
 on:
-  workflow_dispatch:
-    inputs:
-      browsers:
-        description: 'Browsers to test on Azure'
-        required: true
-        default: 'chromium,firefox,webkit'
-        type: choice
-        options:
-        - 'chromium'
-        - 'firefox'
-        - 'webkit'
-        - 'chromium,firefox,webkit'
-      workers:
-        description: 'Number of workers'
-        required: false
-        default: '4'
-        type: string
-  schedule:
-    - cron: '0 6 * * 1'
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ test ]
 
 env:
   DOTNET_VERSION: '8.0.x'
