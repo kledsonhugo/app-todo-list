@@ -104,13 +104,5 @@ jobs:
       if: always()
       with:
         name: playwright-single-browser
-        path: tests/playwright-report/
-        retention-days: 30
-
-    - name: Upload screenshots
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: playwright-screenshots
-        path: tests/test-results/
+        path: tests/playwright-single-browser/
         retention-days: 30
