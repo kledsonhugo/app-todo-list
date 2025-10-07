@@ -25,7 +25,7 @@ Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas
 ├── tests/                # Test Suite Completo
 │   ├── e2e/                # Testes End-to-End
 │   │   ├── api.spec.js       # Testes da API (8 cenários)
-│   │   └── todo-app.spec.js  # Testes da interface (8 cenários)
+│   │   └── todo-app.spec.js  # Testes da interface (16 cenários - 100% cobertura)
 │   ├── playwright.chromium.config.js    # Config local Chromium apenas (4 workers)
 │   ├── playwright.multi.config.js       # Config local multi-browser (4 workers)
 │   ├── playwright.azure.chromium.config.ts  # Config Azure Chromium (10 workers)
@@ -272,7 +272,7 @@ Para usar o pipeline Azure Playwright, configure os secrets no GitHub:
 
 ### Cobertura de Testes
 - **16 testes de API** - Cobertura completa de todos os endpoints REST
-- **16 testes de UI** - Cobertura de todas as interações da interface web
+- **16 testes de UI** - Cobertura de 100% das funcionalidades da interface web
 - **Total: 32 testes** executados em paralelo com 4 workers
 
 ### Cenários Testados
@@ -287,15 +287,23 @@ Para usar o pipeline Azure Playwright, configure os secrets no GitHub:
 - ✅ Tratar erro 404 para tarefa inexistente
 - ✅ Validar campos obrigatórios
 
-#### **Interface Tests (8 cenários)**
+#### **Interface Tests (16 cenários)** - 🎯 100% de Cobertura
 - ✅ Carregamento da página principal
 - ✅ Exibição de tarefas padrão
 - ✅ Criação de novas tarefas
-- ✅ Marcação como concluída/pendente
+- ✅ Marcação como concluída (pendente → concluída)
+- ✅ Reabertura de tarefas (concluída → pendente)
 - ✅ Filtros por status (Todas/Pendentes/Concluídas)
 - ✅ Abertura do modal de edição
+- ✅ Edição completa de tarefas (abrir, editar, salvar)
+- ✅ Cancelamento de edição
+- ✅ Fechar modal clicando fora (backdrop)
 - ✅ Exclusão de tarefas com confirmação
 - ✅ Atualização da lista (refresh)
+- ✅ Validação de formulário (título obrigatório)
+- ✅ Exibição de mensagem quando lista está vazia
+- ✅ Renderização de tarefa sem descrição
+- ✅ Verificação de notificações toast
 
 ## Licença
 
