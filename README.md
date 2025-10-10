@@ -4,39 +4,39 @@ Uma aplicação .NET 8.0 Web API completa para gerenciamento de lista de tarefas
 
 ## Acesso Rápido
 
-- ** Interface Web:** http://localhost:5146
-- ** API Docs (Swagger):** http://localhost:5146/api/docs
+- **Interface Web:** http://localhost:5146
+- **API Docs (Swagger):** http://localhost:5146/api/docs
 
 ## Estrutura do Projeto
 
 ```
-├── Controllers/           # API Controllers
-│   └── TodosController.cs    # Endpoints REST da API
-├── DTOs/                 # Data Transfer Objects
-│   └── TodoItemDtos.cs      # Contratos de entrada/saída
-├── Models/               # Domain Models
-│   └── TodoItem.cs         # Modelo principal da tarefa
-├── Services/             # Business Logic
-│   └── TodoService.cs      # Serviço de gerenciamento de tarefas
-├── wwwroot/              # Static Web Assets
-│   ├── index.html          # Interface web principal
-│   ├── styles.css          # Estilos CSS responsivos
-│   └── script.js           # JavaScript da aplicação
-├── tests/                # Test Suite Completo
-│   ├── e2e/                # Testes End-to-End
-│   │   ├── api.spec.js       # Testes da API (8 cenários)
-│   │   └── todo-app.spec.js  # Testes da interface (8 cenários)
-│   ├── playwright.chromium.config.js    # Config local Chromium apenas (4 workers)
-│   ├── playwright.multi.config.js       # Config local multi-browser (4 workers)
-│   ├── playwright.azure.chromium.config.ts  # Config Azure Chromium (10 workers)
-│   ├── playwright.azure.multi.config.ts     # Config Azure multi-browser (8 workers)
-│   ├── package.json        # Scripts npm e dependências
-│   └── package-lock.json   # Lock das dependências
-├── .github/workflows/    # CI/CD Pipelines
-│   ├── playwright-tests.yml        # Pipeline principal E2E
-│   ├── multi-browser-tests.yml     # Pipeline multi-browser
-│   └── production-release.yml      # Pipeline de produção
-└── Program.cs            # Configuração da aplicação
+├── Controllers/                             # API Controllers
+│   └── TodosController.cs                   # Endpoints REST da API
+├── DTOs/                                    # Data Transfer Objects
+│   └── TodoItemDtos.cs                      # Contratos de entrada/saída
+├── Models/                                  # Domain Models
+│   └── TodoItem.cs                          # Modelo principal da tarefa
+├── Services/                                # Business Logic
+│   └── TodoService.cs                       # Serviço de gerenciamento de tarefas
+├── wwwroot/                                 # Static Web Assets
+│   ├── index.html                           # Interface web principal
+│   ├── styles.css                           # Estilos CSS responsivos
+│   └── script.js                            # JavaScript da aplicação
+├── tests/                                   # Test Suite Completo
+│   ├── e2e/                                 # Testes End-to-End
+│   │   ├── api.spec.js                      # Testes da API (8 cenários)
+│   │   └── todo-app.spec.js                 # Testes da interface (8 cenários)
+│   ├── playwright.chromium.config.js        # Config local Chromium apenas (4 workers)
+│   ├── playwright.multi.config.js           # Config local multi-browser (4 workers)
+│   ├── playwright.azure.chromium.config.ts  # Config Azure Chromium (4 workers)
+│   ├── playwright.azure.multi.config.ts     # Config Azure multi-browser (4 workers)
+│   ├── package.json                         # Scripts npm e dependências
+│   └── package-lock.json                    # Lock das dependências
+├── .github/workflows/                       # CI/CD Pipelines
+│   ├── playwright-tests.yml                 # Pipeline principal E2E
+│   ├── multi-browser-tests.yml              # Pipeline multi-browser
+│   └── production-release.yml               # Pipeline de produção
+└── Program.cs                               # Configuração da aplicação
 ```
 
 ## Como Executar
@@ -198,7 +198,7 @@ Remove uma tarefa.
 - **`playwright-multi-browser.yml`** - Pipeline multi-browser (Chromium, Firefox, WebKit)
 - **`playwright-production.yml`** - Pipeline de produção
 
-### Pipelines Azure ☁️
+### Pipelines Azure
 - **`azure-playwright-single-browser.yml`** - Azure Playwright single-browser (Chromium otimizado)
 - **`azure-playwright-multi-browser.yml`** - Azure multi-browser com matrix strategy
 
@@ -209,34 +209,17 @@ Remove uma tarefa.
 - **Execução Flexível**: Manual (workflow_dispatch) e agendada (semanal)
 - **Artefatos Separados**: Relatórios individualizados por browser
 
-### Comparativo de Performance
-
-| Pipeline | Workers | Browsers | Duração Estimada | Uso |
-|----------|---------|----------|------------------|-----|
-| **Local Chromium** | 4 | Chromium | ~3-5 min | ✅ Validação rápida |
-| **Local Multi-browser** | 4 | Chrome/Firefox/WebKit | ~8-12 min | ✅ Compatibilidade |
-| **Azure Chromium** | 10 | Chromium | ~2-3 min | ⚡ Performance |
-| **Azure Multi-browser** | 8 | Chrome/Firefox/WebKit | ~5-8 min | 🚀 Cobertura + Speed |
-
 ## Azure Playwright Integration 🚀
 
 ### ☁️ Pipeline de Testes Single Browser com Azure Playwright
 - **Arquivo**: `.github/workflows/azure-playwright-tests.yml`
-- **Trigger**: Manual + Agendado diário (3:00 AM UTC)
+- **Trigger**: Manual
 - **Configuração**: `playwright.azure.chromium.config.ts` ou `playwright.azure.multi.config.ts`
 - **Browsers**: Configurável (Chromium ou Multi-browser)
-- **Workers**: 8-20 workers (configurável)
+- **Workers**: 4 workers (configurável)
 - **Modo**: Nuvem Azure Playwright
 - **Tempo**: ~2-6 minutos (dependendo da configuração)
 - **Objetivo**: Testes de alta performance na nuvem
-
-### Performance Comparativa
-| Pipeline | Configuração | Workers | Browsers | Tempo Médio | Ambiente |
-|----------|-------------|---------|----------|-------------|----------|
-| Single Browser | Local Chromium | 4 | 1 (Chromium) | ~1.5min | GitHub Actions |
-| Multi-Browser | Local Multi | 4x3 | 3 (Chrome/Firefox/Safari) | ~4-5min | GitHub Actions |
-| Produção | Local Chromium | 4 | 1 (Chromium) | ~4min | GitHub Actions |
-| Single Browser Azure | Azure Cloud | 10 | 1 (Chromium) | ~2-3min | Azure Playwright |
 
 ## Azure Playwright
 
