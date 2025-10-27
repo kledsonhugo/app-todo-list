@@ -1,0 +1,26 @@
+# Bicep build outputs
+*.json
+!parameters/*.parameters.json
+
+# Azure CLI temporary files
+.azure/
+
+# Deployment logs
+deployment-*.log
+
+# IDE files
+.vscode/
+.vs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Credentials and secrets (should never be committed)
+*.secrets
+secrets.json
+local.parameters.json
