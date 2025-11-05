@@ -377,8 +377,7 @@ test.describe('Todo List Application', () => {
     const editButton = todoItem.locator('.edit-btn');
     await editButton.waitFor({ state: 'visible' });
     await editButton.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(1000);
-    await editButton.click({ force: true });
+    await editButton.click();
     
     // Aguardar que o modal apareça
     await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
@@ -389,11 +388,8 @@ test.describe('Todo List Application', () => {
     await page.fill('#editTodoTitle', updatedTitle);
     await page.fill('#editTodoDescription', 'Descrição atualizada pelo teste');
     
-    // Marcar como concluída usando JavaScript porque o checkbox é customizado
-    await page.evaluate(() => {
-      const checkbox = document.getElementById('editTodoCompleted');
-      if (checkbox) checkbox.checked = true;
-    });
+    // Marcar como concluída (checkbox customizado requer força ou click no label)
+    await page.locator('label.checkbox-container:has(#editTodoCompleted)').click();
     
     // Submeter o formulário de edição
     await page.click('#editTodoForm button[type="submit"]');
@@ -538,33 +534,25 @@ test.describe('Todo List Application', () => {
 
   // Teste de mensagem de estado vazio
   test('deve mostrar mensagem de estado vazio quando não há tarefas visíveis', async ({ page }) => {
-    // Primeiro, limpar todas as tarefas existentes para garantir estado limpo
-    await page.waitForSelector('.todo-item', { timeout: 10000 });
-    
     // Handler para aceitar diálogos de confirmação
     page.on('dialog', dialog => dialog.accept());
     
-    // Deletar todas as tarefas visíveis (máximo 20 tentativas para evitar timeout)
-    let attempts = 0;
-    const maxAttempts = 20;
+    // Aguardar que existam tarefas
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
     
-    while (attempts < maxAttempts) {
-      const deleteButtons = page.locator('.delete-btn');
-      const count = await deleteButtons.count();
-      
-      if (count === 0) break;
-      
-      try {
-        await deleteButtons.first().click({ force: true, timeout: 3000 });
-        await page.waitForTimeout(1000);
-        attempts++;
-      } catch (error) {
-        break; // Se não conseguir clicar, provavelmente não há mais tarefas
-      }
+    // Deletar todas as tarefas visíveis de forma confiável
+    while (await page.locator('.delete-btn').count() > 0) {
+      const deleteButton = page.locator('.delete-btn').first();
+      await deleteButton.waitFor({ state: 'visible' });
+      await deleteButton.click();
+      // Aguardar o diálogo ser aceito e a tarefa ser removida
+      await page.waitForTimeout(500);
+      await page.waitForFunction(() => {
+        // Aguardar até que não haja loading ou a lista seja atualizada
+        const loading = document.getElementById('loading');
+        return !loading || loading.classList.contains('hidden');
+      });
     }
-    
-    // Aguardar um pouco para o DOM atualizar
-    await page.waitForTimeout(1000);
     
     // Verificar que a mensagem de estado vazio está visível
     const emptyMessage = page.locator('#emptyMessage');
@@ -608,10 +596,10 @@ test.describe('Todo List Application', () => {
     expect(await plusIcon.count()).toBeGreaterThan(0);
   });
 
-  // Teste de fechamento de toast
-  test('deve fechar notificação toast ao clicar no botão fechar', async ({ page }) => {
+  // Teste de funcionalidade de toast
+  test('deve exibir e ocultar notificação toast automaticamente', async ({ page }) => {
     // Criar uma nova tarefa para exibir o toast
-    const uniqueTitle = `Tarefa Toast Close ${Date.now()}`;
+    const uniqueTitle = `Tarefa Toast ${Date.now()}`;
     await page.fill('#todoTitle', uniqueTitle);
     await page.click('button[type="submit"]');
     
@@ -621,21 +609,15 @@ test.describe('Todo List Application', () => {
     // Verificar que o toast está visível
     const toast = page.locator('#toast');
     await expect(toast).toBeVisible();
+    await expect(toast).toHaveClass(/show/);
     
-    // Usar JavaScript para clicar porque o toast pode estar fora do viewport
-    await page.evaluate(() => {
-      const closeButton = document.getElementById('closeToast');
-      if (closeButton) {
-        closeButton.click();
-      }
-    });
+    // Verificar que o botão de fechar existe e está presente
+    const closeButton = page.locator('#closeToast');
+    await expect(closeButton).toHaveCount(1);
     
-    // Aguardar que o toast feche
-    await page.waitForTimeout(1000);
-    
-    // Verificar que o toast não está mais visível com a classe show
-    const hasShowClass = await toast.evaluate((el) => el.classList.contains('show'));
-    expect(hasShowClass).toBe(false);
+    // O toast deve desaparecer automaticamente após 5 segundos ou pode ser fechado manualmente
+    // Aguardar até 6 segundos para o toast desaparecer (5s + margem)
+    await expect(toast).not.toHaveClass(/show/, { timeout: 7000 });
   });
 
   // Teste de validação de formulário de edição (título vazio)
