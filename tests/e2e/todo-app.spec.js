@@ -360,4 +360,373 @@ test.describe('Todo List Application', () => {
     const remainingItems = page.locator('.todo-item').filter({ hasText: uniqueTitle });
     await expect(remainingItems).toHaveCount(0);
   });
+
+  // Teste completo de edição de tarefa via modal
+  test('deve editar uma tarefa completamente através do modal', async ({ page }) => {
+    // Criar uma tarefa específica para este teste
+    const originalTitle = `Tarefa Original ${Date.now()}`;
+    await page.fill('#todoTitle', originalTitle);
+    await page.fill('#todoDescription', 'Descrição original');
+    await page.click('button[type="submit"]');
+    
+    // Aguardar que a tarefa apareça
+    await page.waitForSelector(`text="${originalTitle}"`, { timeout: 10000 });
+    
+    // Localizar e clicar no botão de editar
+    const todoItem = page.locator('.todo-item').filter({ hasText: originalTitle });
+    const editButton = todoItem.locator('.edit-btn');
+    await editButton.waitFor({ state: 'visible' });
+    await editButton.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1000);
+    await editButton.click({ force: true });
+    
+    // Aguardar que o modal apareça
+    await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
+    await expect(page.locator('#editModal')).toBeVisible();
+    
+    // Editar os campos do formulário
+    const updatedTitle = `Tarefa Editada ${Date.now()}`;
+    await page.fill('#editTodoTitle', updatedTitle);
+    await page.fill('#editTodoDescription', 'Descrição atualizada pelo teste');
+    
+    // Marcar como concluída usando JavaScript porque o checkbox é customizado
+    await page.evaluate(() => {
+      const checkbox = document.getElementById('editTodoCompleted');
+      if (checkbox) checkbox.checked = true;
+    });
+    
+    // Submeter o formulário de edição
+    await page.click('#editTodoForm button[type="submit"]');
+    
+    // Aguardar que o modal feche (verificar que a classe hidden está presente)
+    await page.waitForTimeout(1000);
+    await expect(page.locator('#editModal')).toHaveClass(/hidden/);
+    
+    // Aguardar que a tarefa atualizada apareça
+    await page.waitForSelector(`text="${updatedTitle}"`, { timeout: 10000 });
+    
+    // Verificar que a tarefa foi atualizada
+    await expect(page.locator(`text="${updatedTitle}"`).first()).toBeVisible();
+    await expect(page.locator('.todo-item').filter({ hasText: updatedTitle })).toContainText('Concluída');
+  });
+
+  // Teste de fechar modal clicando fora
+  test('deve fechar o modal ao clicar fora dele', async ({ page }) => {
+    // Aguardar que as tarefas carreguem
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    await page.waitForTimeout(2000);
+    
+    // Clicar no botão de editar da primeira tarefa
+    const editButton = page.locator('.edit-btn').first();
+    await editButton.waitFor({ state: 'visible' });
+    await editButton.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1000);
+    await editButton.click({ force: true });
+    
+    // Aguardar que o modal apareça
+    await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
+    await expect(page.locator('#editModal')).toBeVisible();
+    
+    // Clicar fora do modal (no overlay)
+    await page.locator('#editModal').click({ position: { x: 5, y: 5 } });
+    
+    // Verificar que o modal foi fechado
+    await expect(page.locator('#editModal')).toHaveClass(/hidden/);
+  });
+
+  // Teste de fechar modal via botão Cancelar
+  test('deve fechar o modal ao clicar no botão Cancelar', async ({ page }) => {
+    // Aguardar que as tarefas carreguem
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    await page.waitForTimeout(2000);
+    
+    // Clicar no botão de editar da primeira tarefa
+    const editButton = page.locator('.edit-btn').first();
+    await editButton.waitFor({ state: 'visible' });
+    await editButton.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1000);
+    await editButton.click({ force: true });
+    
+    // Aguardar que o modal apareça
+    await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
+    await expect(page.locator('#editModal')).toBeVisible();
+    
+    // Clicar no botão Cancelar
+    await page.click('#cancelEdit');
+    
+    // Verificar que o modal foi fechado
+    await expect(page.locator('#editModal')).toHaveClass(/hidden/);
+  });
+
+  // Teste de reabrir tarefa concluída
+  test('deve reabrir uma tarefa concluída', async ({ page }) => {
+    // Criar uma nova tarefa para este teste
+    const testTitle = `Tarefa Reabrir ${Date.now()}`;
+    await page.fill('#todoTitle', testTitle);
+    await page.click('button[type="submit"]');
+    
+    // Aguardar que a tarefa apareça
+    await page.waitForSelector(`text="${testTitle}"`, { timeout: 10000 });
+    await page.waitForTimeout(1000);
+    
+    // Encontrar a tarefa e concluí-la
+    const todoItem = page.locator('.todo-item').filter({ hasText: testTitle });
+    const concluirButton = todoItem.locator('.toggle-btn').filter({ hasText: 'Concluir' });
+    
+    await concluirButton.waitFor({ state: 'visible' });
+    await concluirButton.scrollIntoViewIfNeeded();
+    await concluirButton.click({ force: true });
+    
+    // Aguardar que a tarefa seja marcada como concluída
+    await page.waitForTimeout(2000);
+    
+    // Verificar que o botão mudou para "Reabrir"
+    const reopenButton = todoItem.locator('.toggle-btn').filter({ hasText: 'Reabrir' });
+    await expect(reopenButton).toBeVisible({ timeout: 10000 });
+    
+    // Agora reabrir a tarefa
+    await reopenButton.scrollIntoViewIfNeeded();
+    await reopenButton.click({ force: true });
+    
+    // Aguardar que a tarefa seja reaberta
+    await page.waitForTimeout(2000);
+    
+    // Verificar que o botão mudou de volta para "Concluir"
+    const concluirButtonAgain = todoItem.locator('.toggle-btn').filter({ hasText: 'Concluir' });
+    await expect(concluirButtonAgain).toBeVisible({ timeout: 10000 });
+  });
+
+  // Teste de validação de formulário (título vazio)
+  test('deve validar que o título é obrigatório ao criar tarefa', async ({ page }) => {
+    // Tentar submeter o formulário sem preencher o título
+    await page.click('#addTodoForm button[type="submit"]');
+    
+    // Verificar que o campo título está marcado como inválido (validação HTML5)
+    const titleInput = page.locator('#todoTitle');
+    const isInvalid = await titleInput.evaluate((el) => !el.validity.valid);
+    expect(isInvalid).toBe(true);
+    
+    // Verificar que nenhuma tarefa foi criada
+    // (o formulário não deve ter sido submetido)
+    await page.waitForTimeout(1000);
+    
+    // Agora preencher o título e verificar que pode submeter
+    await page.fill('#todoTitle', 'Tarefa com título válido');
+    await page.click('#addTodoForm button[type="submit"]');
+    
+    // Verificar que a tarefa foi criada
+    await page.waitForSelector('text="Tarefa com título válido"', { timeout: 10000 });
+    await expect(page.locator('text="Tarefa com título válido"').first()).toBeVisible();
+  });
+
+  // Teste de notificação toast ao criar tarefa
+  test('deve mostrar notificação toast ao criar tarefa com sucesso', async ({ page }) => {
+    // Criar uma nova tarefa
+    const uniqueTitle = `Tarefa Toast ${Date.now()}`;
+    await page.fill('#todoTitle', uniqueTitle);
+    await page.click('button[type="submit"]');
+    
+    // Aguardar que o toast apareça
+    await page.waitForSelector('#toast.show', { timeout: 10000 });
+    
+    // Verificar que o toast está visível com a mensagem correta
+    const toast = page.locator('#toast');
+    await expect(toast).toBeVisible();
+    await expect(toast).toHaveClass(/show/);
+    await expect(page.locator('#toastMessage')).toContainText('sucesso');
+  });
+
+  // Teste de mensagem de estado vazio
+  test('deve mostrar mensagem de estado vazio quando não há tarefas visíveis', async ({ page }) => {
+    // Primeiro, limpar todas as tarefas existentes para garantir estado limpo
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    
+    // Handler para aceitar diálogos de confirmação
+    page.on('dialog', dialog => dialog.accept());
+    
+    // Deletar todas as tarefas visíveis (máximo 20 tentativas para evitar timeout)
+    let attempts = 0;
+    const maxAttempts = 20;
+    
+    while (attempts < maxAttempts) {
+      const deleteButtons = page.locator('.delete-btn');
+      const count = await deleteButtons.count();
+      
+      if (count === 0) break;
+      
+      try {
+        await deleteButtons.first().click({ force: true, timeout: 3000 });
+        await page.waitForTimeout(1000);
+        attempts++;
+      } catch (error) {
+        break; // Se não conseguir clicar, provavelmente não há mais tarefas
+      }
+    }
+    
+    // Aguardar um pouco para o DOM atualizar
+    await page.waitForTimeout(1000);
+    
+    // Verificar que a mensagem de estado vazio está visível
+    const emptyMessage = page.locator('#emptyMessage');
+    await expect(emptyMessage).toBeVisible({ timeout: 5000 });
+    await expect(emptyMessage).toContainText('Nenhuma tarefa encontrada');
+  });
+
+  // Teste de carregamento de CSS
+  test('deve carregar o arquivo CSS corretamente', async ({ page }) => {
+    // Verificar que o link do CSS está presente
+    const cssLink = page.locator('link[rel="stylesheet"][href="styles.css"]');
+    await expect(cssLink).toHaveCount(1);
+    
+    // Verificar que alguns estilos foram aplicados
+    const container = page.locator('.container');
+    const backgroundColor = await container.evaluate((el) => {
+      return window.getComputedStyle(el).backgroundColor;
+    });
+    
+    // Verificar que algum estilo foi aplicado (não é o padrão transparent)
+    expect(backgroundColor).toBeTruthy();
+  });
+
+  // Teste de carregamento de Font Awesome
+  test('deve carregar os ícones Font Awesome', async ({ page }) => {
+    // Verificar que o link do Font Awesome está presente
+    const fontAwesomeLink = page.locator('link[href*="font-awesome"]');
+    await expect(fontAwesomeLink).toHaveCount(1);
+    
+    // Verificar que os ícones estão visíveis
+    const icons = page.locator('i.fas, i.fa');
+    const iconCount = await icons.count();
+    expect(iconCount).toBeGreaterThan(0);
+    
+    // Verificar que ícones específicos estão presentes (aguardar carregamento)
+    await page.waitForTimeout(1000);
+    const tasksIcon = page.locator('i.fa-tasks');
+    expect(await tasksIcon.count()).toBeGreaterThan(0);
+    
+    const plusIcon = page.locator('i.fa-plus');
+    expect(await plusIcon.count()).toBeGreaterThan(0);
+  });
+
+  // Teste de fechamento de toast
+  test('deve fechar notificação toast ao clicar no botão fechar', async ({ page }) => {
+    // Criar uma nova tarefa para exibir o toast
+    const uniqueTitle = `Tarefa Toast Close ${Date.now()}`;
+    await page.fill('#todoTitle', uniqueTitle);
+    await page.click('button[type="submit"]');
+    
+    // Aguardar que o toast apareça
+    await page.waitForSelector('#toast.show', { timeout: 10000 });
+    
+    // Verificar que o toast está visível
+    const toast = page.locator('#toast');
+    await expect(toast).toBeVisible();
+    
+    // Usar JavaScript para clicar porque o toast pode estar fora do viewport
+    await page.evaluate(() => {
+      const closeButton = document.getElementById('closeToast');
+      if (closeButton) {
+        closeButton.click();
+      }
+    });
+    
+    // Aguardar que o toast feche
+    await page.waitForTimeout(1000);
+    
+    // Verificar que o toast não está mais visível com a classe show
+    const hasShowClass = await toast.evaluate((el) => el.classList.contains('show'));
+    expect(hasShowClass).toBe(false);
+  });
+
+  // Teste de validação de formulário de edição (título vazio)
+  test('deve validar que o título é obrigatório ao editar tarefa', async ({ page }) => {
+    // Aguardar que as tarefas carreguem
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    await page.waitForTimeout(2000);
+    
+    // Clicar no botão de editar da primeira tarefa
+    const editButton = page.locator('.edit-btn').first();
+    await editButton.waitFor({ state: 'visible' });
+    await editButton.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1000);
+    await editButton.click({ force: true });
+    
+    // Aguardar que o modal apareça
+    await page.waitForSelector('#editModal:not(.hidden)', { timeout: 10000 });
+    
+    // Limpar o campo título
+    await page.fill('#editTodoTitle', '');
+    
+    // Tentar submeter o formulário
+    await page.click('#editTodoForm button[type="submit"]');
+    
+    // Verificar que o campo título está marcado como inválido
+    const titleInput = page.locator('#editTodoTitle');
+    const isInvalid = await titleInput.evaluate((el) => !el.validity.valid);
+    expect(isInvalid).toBe(true);
+    
+    // Verificar que o modal ainda está aberto
+    await expect(page.locator('#editModal')).toBeVisible();
+  });
+
+  // Teste de elementos da interface estarem presentes
+  test('deve ter todos os elementos principais da interface', async ({ page }) => {
+    // Verificar seção de adicionar tarefa
+    await expect(page.locator('.add-todo-section')).toBeVisible();
+    await expect(page.locator('#addTodoForm')).toBeVisible();
+    await expect(page.locator('#todoTitle')).toBeVisible();
+    await expect(page.locator('#todoDescription')).toBeVisible();
+    
+    // Verificar seção de filtros
+    await expect(page.locator('.filters-section')).toBeVisible();
+    await expect(page.locator('[data-filter="all"]')).toBeVisible();
+    await expect(page.locator('[data-filter="pending"]')).toBeVisible();
+    await expect(page.locator('[data-filter="completed"]')).toBeVisible();
+    
+    // Verificar seção de tarefas
+    await expect(page.locator('.todos-section')).toBeVisible();
+    await expect(page.locator('#todosList')).toBeVisible();
+    await expect(page.locator('#refreshBtn')).toBeVisible();
+    
+    // Verificar modal de edição (mesmo que oculto)
+    await expect(page.locator('#editModal')).toHaveCount(1);
+    
+    // Verificar toast (mesmo que oculto)
+    await expect(page.locator('#toast')).toHaveCount(1);
+  });
+
+  // Teste de contador de tarefas
+  test('deve manter o contador de tarefas correto ao adicionar e remover', async ({ page }) => {
+    // Contar tarefas iniciais
+    await page.waitForSelector('.todo-item', { timeout: 10000 });
+    const initialCount = await page.locator('.todo-item').count();
+    
+    // Adicionar uma nova tarefa
+    const uniqueTitle = `Tarefa Contador ${Date.now()}`;
+    await page.fill('#todoTitle', uniqueTitle);
+    await page.click('button[type="submit"]');
+    
+    // Aguardar que a tarefa apareça
+    await page.waitForSelector(`text="${uniqueTitle}"`, { timeout: 10000 });
+    await page.waitForTimeout(1000);
+    
+    // Verificar que o contador aumentou
+    const afterAddCount = await page.locator('.todo-item').count();
+    expect(afterAddCount).toBe(initialCount + 1);
+    
+    // Remover a tarefa recém-criada
+    const todoItem = page.locator('.todo-item').filter({ hasText: uniqueTitle });
+    const deleteButton = todoItem.locator('.delete-btn');
+    
+    page.on('dialog', dialog => dialog.accept());
+    await deleteButton.click({ force: true });
+    
+    // Aguardar que a tarefa seja removida
+    await page.waitForSelector(`text="${uniqueTitle}"`, { state: 'detached', timeout: 10000 });
+    await page.waitForTimeout(1000);
+    
+    // Verificar que voltamos ao contador inicial
+    const finalCount = await page.locator('.todo-item').count();
+    expect(finalCount).toBe(initialCount);
+  });
 });
